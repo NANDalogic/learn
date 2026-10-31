@@ -3,10 +3,7 @@
 .hl { font-weight: 700; box-shadow: inset 0 -.35em 0 var(--hue-soft); }
 .intro-key { margin: 1.25rem 0; }
 .intro-key p { margin: .35rem 0 0; }
-.ctl-label { display: block; font-size: .78rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-2); margin-bottom: .25rem; }
 .center { text-align: center; }
-.g-label { font-size: 11px; }
-.muted-text { fill: var(--ink-3) !important; }
 .module code { font-family: var(--mono); font-size: .85rem; overflow-wrap: anywhere; }
 .module h4 { margin: 1.4rem 0 .4rem; }
 .module h4:first-child { margin-top: .5rem; }
@@ -45,38 +42,8 @@
 .ladder-table summary { cursor: pointer; min-height: var(--tap); display: flex; align-items: center; font-weight: 600; }
 
 /* ---------- M2 gates ---------- */
-.gate-controls { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; justify-content: space-between; }
-.inputs { display: flex; gap: .5rem; }
-.input-btn { font-weight: 600; }
-.input-btn[aria-pressed="true"] { border-color: #9c6c00; }
-.gate-out { display: flex; align-items: center; gap: .9rem; flex-wrap: wrap; margin: .9rem 0 .25rem; }
-.lamp { display: inline-flex; align-items: center; gap: .5rem; font-weight: 700; font-size: 1.05rem; }
-.lamp-dot { width: 1.6rem; height: 1.6rem; border-radius: 50%; background: var(--off); border: 2px solid var(--ink-3); }
-.lamp.is-1 .lamp-dot { background: var(--on); border-color: #9c6c00; box-shadow: 0 0 0 6px color-mix(in srgb, var(--on) 30%, transparent); }
 .gate-rule { margin: 0; font-size: .92rem; color: var(--ink-2); }
 .nand-note { margin: .35rem 0; padding: .45rem .7rem; border-radius: 8px; background: var(--computer-soft); font-size: .92rem; }
-.cmos { max-width: 30rem; margin: .5rem auto 0; }
-.cmos .rail { stroke: var(--ink-3); stroke-width: 3; }
-.cmos .rail-1 { stroke: #b07a00; }
-.cmos .rail-label, .cmos .stage-label, .cmos .node-name { font-size: 12px; font-weight: 700; }
-.cmos .stage-label { fill: var(--ink-2) !important; }
-.cmos .wire { stroke: var(--ink-3); stroke-width: 2; opacity: .55; }
-.cmos .wire.live { stroke: var(--computer); opacity: 1; stroke-width: 3; }
-.cmos .tr rect { stroke-width: 2; }
-.cmos .tr.on rect { fill: var(--computer-soft); stroke: var(--computer); }
-.cmos .tr.off rect { fill: var(--surface-2); stroke: var(--ink-3); stroke-dasharray: 4 3; }
-.cmos .tr-in { font-size: 11px; font-weight: 700; font-family: var(--mono); }
-.cmos .tr-state { font-size: 10px; }
-.cmos .tr.off .tr-state { fill: var(--ink-3) !important; }
-.cmos .node { stroke: var(--ink-3); stroke-width: 2; }
-.cmos .node.is-1 { fill: var(--on); stroke: #9c6c00; }
-.cmos .node.is-0 { fill: var(--off); }
-.cmos .node-text { font-size: 13px; font-weight: 700; font-family: var(--mono); fill: #1b1d22 !important; }
-.cmos .node.is-0 + .node-text { fill: var(--off-ink) !important; }
-.cmos-legend { margin-top: .4rem; }
-.truth { max-width: 16rem; }
-.truth td, .truth th { text-align: center; padding: .35rem .5rem; }
-.truth tr.current td { background: var(--computer-soft); }
 
 /* ---------- M3 neuron ---------- */
 .n-inputs { display: grid; gap: .5rem; margin-bottom: 1rem; }
@@ -184,24 +151,3 @@
 .counters dd { margin: 0; font-family: var(--mono); font-weight: 700; text-align: right; }
 .scale-out { font-size: .95rem; }
 
-/* ---------- M8 self-check ---------- */
-.match { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
-.match-col { display: grid; gap: .4rem; align-content: start; }
-.match-btn { justify-content: flex-start; text-align: left; font-size: .9rem; border-left: 4px solid var(--hue); }
-.match-btn[aria-pressed="true"] { background: var(--hue-soft); border-color: var(--ink); border-left-color: var(--hue); font-weight: 700; }
-.match-btn.matched { opacity: .6; border-style: dashed; border-left-style: solid; }
-.match-fb { font-size: .92rem; min-height: 3em; }
-.quiz { padding-left: 0; list-style: none; counter-reset: q; }
-.quiz > li { counter-increment: q; margin: 0 0 1rem; }
-.quiz fieldset { border: 1px solid var(--line); border-radius: 12px; padding: .6rem .8rem .8rem; margin: 0; }
-.quiz legend { font-weight: 700; padding: 0 .3rem; }
-.quiz legend::before { content: counter(q) ". "; color: var(--ink-3); }
-.opt { display: flex; align-items: center; gap: .55rem; border-radius: 8px; padding: 0 .4rem; min-height: var(--tap); }
-.opt input { width: 1.2rem; height: 1.2rem; accent-color: var(--ink); flex: none; margin: 0; }
-.opt label { flex: 1; padding: .4rem 0; }
-.opt.right { background: color-mix(in srgb, var(--good) 14%, transparent); }
-.opt.right label::after { content: "  ✓"; color: var(--good); font-weight: 700; }
-.opt.wrong { background: color-mix(in srgb, var(--weak) 14%, transparent); }
-.opt.wrong label::after { content: "  ✕"; color: var(--weak); font-weight: 700; }
-.quiz-fb { font-size: .9rem; margin-top: .4rem; }
-.quiz-score { font-weight: 700; margin: 0; }

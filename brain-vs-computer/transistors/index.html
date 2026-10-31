@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inside the Switch: Transistors, Logic, and Bits · learn.nandalogic.com</title>
+<meta name="description" content="What a transistor is, how chips are made, how transistors become gates, adders and memory, how bits become letters on a screen, and how quantum computing differs.">
+<meta name="color-scheme" content="light dark">
+<script>try{var t=JSON.parse(localStorage.getItem("theme"));if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="page.css">
+<script src="/assets/site.js" defer></script>
+<script src="/assets/widgets.js" defer></script>
+<script src="modules/t1-transistor.js" defer></script>
+<script src="modules/t2-name-vs-ruler.js" defer></script>
+<script src="modules/t3-build-a-gate.js" defer></script>
+<script src="modules/t4-truth-tables.js" defer></script>
+<script src="modules/t5-adder.js" defer></script>
+<script src="modules/t6-latch.js" defer></script>
+<script src="modules/t7-byte.js" defer></script>
+<script src="modules/t8-keypress.js" defer></script>
+<script src="modules/t9-timeline.js" defer></script>
+<script src="modules/t10-interference.js" defer></script>
+<script src="modules/t11-self-check.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="bar">
+    <a class="home" href="/">learn</a>
+    <nav class="section-nav" aria-label="Sections">
+      <ol>
+        <li><a href="#recap">Recap</a></li>
+        <li><a href="#transistor">Transistor</a></li>
+        <li><a href="#fabrication">Making chips</a></li>
+        <li><a href="#gates">Gates</a></li>
+        <li><a href="#all-gates">All 16</a></li>
+        <li><a href="#adders-memory">Add &amp; remember</a></li>
+        <li><a href="#bits-bytes">Bits &amp; bytes</a></li>
+        <li><a href="#keypress">Keypress</a></li>
+        <li><a href="#history">History</a></li>
+        <li><a href="#simpler-devices">Microwave?</a></li>
+        <li><a href="#quantum">Quantum</a></li>
+        <li><a href="#self-check">Self-check</a></li>
+        <li><a href="#references">Sources</a></li>
+      </ol>
+    </nav>
+    <button type="button" class="icon theme-toggle" aria-label="Toggle dark mode">☾</button>
+  </div>
+  <div class="progress" aria-hidden="true"><span></span></div>
+</header>
+
+<main id="main" class="wrap">
+
+<p class="back-link"><a href="/brain-vs-computer/#model">← Back to the model</a></p>
+
+<!-- ============ D0 ============ -->
+<section id="recap" class="page-section">
+  <p class="eyebrow">Deep-dive · Brain vs. computer</p>
+  <h1>Inside the Switch: Transistors, Logic, and Bits</h1>
+  <p class="lede">What a transistor is, how chips are made, how switches become arithmetic and memory, how a keypress becomes light, how long this has been going on, and how quantum computing differs.</p>
+
+  <h2>Recap and map</h2>
+  <ul>
+    <li><b>Transistor:</b> a tiny switch controlled by electricity: on or off.</li>
+    <li><b>Bit:</b> one on/off value. High voltage = <span class="bit is-1">1</span>, low voltage = <span class="bit is-0">0</span>.</li>
+    <li><b>Logic gate:</b> a few transistors wired to follow a simple rule (AND, OR, NOT…). Everything a computer does is built from huge numbers of these rules.</li>
+  </ul>
+  <div class="side is-brain recap-brain">
+    <span class="tag">The brain comparison</span>
+    <p>On the main page's matter-to-thought ladder, the transistor pairs with the <b>ion channel</b> (stage 3, "smallest switch"). Both are gates that open or close depending on voltage, but by different mechanisms: semiconductors and electrons versus proteins and ions. A whole <b>neuron</b> is far more than a gate (stage 5).</p>
+    <p><a href="/brain-vs-computer/#model"><b>You are here:</b> ladder stages 3 and 5 →</a></p>
+  </div>
+</section>
+
+<!-- ============ D1 ============ -->
+<section id="transistor" class="page-section">
+  <p class="eyebrow">D1</p>
+  <h2>The transistor: a switch with no moving parts</h2>
+
+  <h3>Silicon and doping</h3>
+  <ul>
+    <li>Adding a tiny amount of other atoms to silicon ("doping") changes how it conducts.[R1]
+      <ul>
+        <li><b>n-type:</b> atoms with 5 outer electrons (e.g., phosphorus) each add a spare, free-moving electron.[R1]</li>
+        <li><b>p-type:</b> atoms with 3 outer electrons (e.g., boron) leave a gap, a <b>"hole"</b>, which acts like a moving positive charge.[R1]</li>
+      </ul></li>
+  </ul>
+
+  <h3>The MOSFET, the transistor in nearly every chip</h3>
+  <ul>
+    <li>Parts: a <b>source</b> and a <b>drain</b> (doped silicon regions), a <b>channel</b> between them, and a <b>gate</b> (a metal electrode sitting on a very thin insulating layer, the gate oxide).[R2]</li>
+    <li>How it switches:
+      <ul>
+        <li>Put enough voltage on the gate (relative to the source), and its electric field pulls a thin layer of mobile charges into the channel just under the oxide.</li>
+        <li>When that layer bridges source and drain, current flows: <b>on</b>.</li>
+        <li>Bring the gate voltage near zero, and the path disappears: <b>off</b>.[R2]</li>
+        <li>The insulator means almost no current flows <i>into</i> the gate itself, so a small voltage controls a larger current.[R2]</li>
+      </ul></li>
+    <li>The basic structure (gate stack, channel, source, drain) hasn't changed since the MOSFET was invented in 1959.[R2] The first device (Atalla and Kahng, Bell Labs) used a metal gate, a silicon-dioxide insulator and a silicon body.[R58]</li>
+  </ul>
+
+  <h3>Shapes over time: wrapping the gate around the channel</h3>
+  <p class="tldr is-computer">Same switch since 1959; each new shape wraps the gate further around the channel.</p>
+  <ol class="vtl is-computer">
+    <li><span class="yr">1959</span><b>MOSFET invented.</b> Its basic structure (gate, channel, source, drain) hasn't changed since.[R2]</li>
+    <li><span class="yr">2011</span><b>FinFET:</b> Intel's 22 nm "Tri-Gate". The gate covers a thin fin on 3 sides.[R3]</li>
+    <li><span class="yr">Q4 2025</span><b>Nanosheet (gate-all-around):</b> TSMC N2 in volume production. The gate wraps stacked ribbons on all sides.[R4][R5]</li>
+    <li><span class="yr">by Oct 2026</span><b>Intel 18A:</b> RibbonFET plus PowerVia (power from the back). Intel says it's in high-volume production.[R6]</li>
+  </ol>
+<details class="more"><summary>Read the details</summary><div class="more-body">
+  <ul>
+    <li><b>Planar:</b> the gate sits on top of a flat channel.</li>
+    <li><b>FinFET (2011):</b> Intel announced its 22 nm "Tri-Gate" transistor on 4 May 2011. The channel becomes a thin vertical fin with the gate on three sides.[R3] Samsung, TSMC and others followed.[R2]</li>
+    <li><b>Gate-all-around / nanosheet:</b> the fin is replaced by a stack of thin silicon ribbons, and the gate wraps all the way around them for better control.[R4]
+      <ul>
+        <li>TSMC's N2 uses its first-generation nanosheet transistors and began volume production in Q4 2025.[R5]</li>
+        <li>Intel's 18A uses "RibbonFET" (gate-all-around) plus "PowerVia", which delivers power from the back of the chip. Intel says 18A is in high-volume production (page read Oct 2026).[R6]</li>
+        <li><span class="todo">TODO: needs source</span> Samsung's first gate-all-around production point is held back until it's sourced.</li>
+      </ul></li>
+    <li><b>Research frontier:</b> Intel has reported a transistor with a 6 nm gate length and a 3 nm-thick nanosheet.[R4]</li>
+  </ul>
+
+</div></details>
+
+  <div class="module is-computer" id="t1" aria-labelledby="t1-title">
+    <div class="module-head"><span class="module-id">T1</span><h3 id="t1-title">Transistor cross-section</h3></div>
+    <p class="goal">A transistor is a voltage-controlled switch, and newer shapes just wrap the gate further around the channel.</p>
+    <div class="module-body"><p class="noscript">This demo needs JavaScript.</p></div>
+    <div class="callout leaves-out"><span class="callout-title">What this leaves out</span>Real transistors turn on gradually and leak a little when "off". This is a 2D sketch of 3D devices, and no real voltages are shown.</div>
+  </div>
+</section>
+
+<!-- ============ D2 ============ -->
+<section id="fabrication" class="page-section">
+  <p class="eyebrow">D2</p>
+  <h2>How chips are made</h2>
+
+  <h3>Wafers and steps</h3>
+  <figure class="fig"><svg viewBox="0 0 320 300" role="img" aria-label="Chip-making loop: deposit, coat, lithography, etch, implant, repeated many times; packaging at the end">
+<circle cx="160" cy="124" r="92" class="st-comp st-dash" stroke-width="2"/>
+<path d="M-6 -5 L6 0 L-6 5 Z" class="fl-comp" transform="translate(214.1 49.6) rotate(36.0)"/>
+<path d="M-6 -5 L6 0 L-6 5 Z" class="fl-comp" transform="translate(247.5 152.4) rotate(108.0)"/>
+<path d="M-6 -5 L6 0 L-6 5 Z" class="fl-comp" transform="translate(160.0 216.0) rotate(180.0)"/>
+<path d="M-6 -5 L6 0 L-6 5 Z" class="fl-comp" transform="translate(72.5 152.4) rotate(252.0)"/>
+<path d="M-6 -5 L6 0 L-6 5 Z" class="fl-comp" transform="translate(105.9 49.6) rotate(324.0)"/>
+<rect x="110.0" y="13.0" width="100" height="38" rx="8" class="fl-comp-soft" stroke-width="2"/>
+<text x="160.0" y="29.0" text-anchor="middle" class="lbl-b">1 Deposit</text>
+<text x="160.0" y="43.0" text-anchor="middle" class="lbl-muted" style="font-size:9.5px">add a thin layer</text>
+<rect x="197.5" y="76.6" width="100" height="38" rx="8" class="fl-comp-soft" stroke-width="2"/>
+<text x="247.5" y="92.6" text-anchor="middle" class="lbl-b">2 Coat</text>
+<text x="247.5" y="106.6" text-anchor="middle" class="lbl-muted" style="font-size:9.5px">light-sensitive resist</text>
+<rect x="164.1" y="179.4" width="100" height="38" rx="8" class="fl-comp-soft" stroke-width="2"/>
+<text x="214.1" y="195.4" text-anchor="middle" class="lbl-b">3 Lithography</text>
+<text x="214.1" y="209.4" text-anchor="middle" class="lbl-muted" style="font-size:9.5px">print the pattern</text>
+<rect x="55.9" y="179.4" width="100" height="38" rx="8" class="fl-comp-soft" stroke-width="2"/>
+<text x="105.9" y="195.4" text-anchor="middle" class="lbl-b">4 Etch</text>
+<text x="105.9" y="209.4" text-anchor="middle" class="lbl-muted" style="font-size:9.5px">remove material</text>
+<rect x="22.5" y="76.6" width="100" height="38" rx="8" class="fl-comp-soft" stroke-width="2"/>
+<text x="72.5" y="92.6" text-anchor="middle" class="lbl-b">5 Implant</text>
+<text x="72.5" y="106.6" text-anchor="middle" class="lbl-muted" style="font-size:9.5px">dope regions</text>
+<text x="160" y="120" text-anchor="middle" class="lbl-b" style="font-size:13px">↻ repeated</text>
+<text x="160" y="136" text-anchor="middle" class="lbl-muted">many times</text>
+<path d="M160 218 V256 m-5 -6 l5 6 l5 -6" class="st-muted" stroke-width="2"/>
+<text x="168" y="242" class="lbl-muted">at the end</text>
+<rect x="105" y="260" width="110" height="34" rx="8" class="fl-comp-soft" stroke-width="2"/>
+<text x="160" y="281" text-anchor="middle" class="lbl-b">6 Packaging</text>
+</svg>
+<figcaption>ASML's six core steps.[R7]</figcaption></figure>
+  <div class="stats is-computer">
+    <div class="stat"><b>300 mm</b><span>most-used wafer size [R7]</span></div>
+    <div class="stat"><b>thousands</b><span>of steps per chip [R7]</span></div>
+    <div class="stat"><b>3+ months</b><span>design to production [R7]</span></div>
+  </div>
+<details class="more"><summary>Read the details</summary><div class="more-body">
+  <ul>
+    <li>Chips are built on thin, polished silicon discs called <b>wafers</b>. <b>300 mm</b> is the size most often used.[R7]</li>
+    <li>ASML (the company that makes the most advanced lithography machines) lists six core steps, repeated many times:[R7]
+      <ol>
+        <li>deposition (add a thin layer)</li>
+        <li>photoresist coating (add a light-sensitive layer)</li>
+        <li>lithography (project the pattern with light)</li>
+        <li>etch (remove material where the pattern says)</li>
+        <li>ion implantation (dope regions)</li>
+        <li>packaging</li>
+      </ol></li>
+    <li>Making a chip takes <b>thousands of steps</b> and can take <b>more than three months</b> from design to production.[R7]</li>
+  </ul>
+
+</div></details>
+
+  <h3>Photolithography: printing with light</h3>
+  <p class="tldr is-computer">Printing with light, invented for silicon in 1955.[R8] Shorter light prints finer patterns.</p>
+  <p class="hbars-title">Light wavelength (to scale)</p>
+  <div class="hbars is-computer">
+    <div class="hbar"><span>DUV laser</span><span class="hbar-val">248 nm</span><span class="hbar-track"><span class="hbar-fill" style="width:100%"></span></span></div>
+    <div class="hbar"><span>DUV laser</span><span class="hbar-val">193 nm</span><span class="hbar-track"><span class="hbar-fill" style="width:77.8%"></span></span></div>
+    <div class="hbar"><span>EUV, &gt;14× shorter [R9]</span><span class="hbar-val">13.5 nm</span><span class="hbar-track"><span class="hbar-fill" style="width:5.44%"></span></span></div>
+  </div>
+  <p class="hbars-title">Finest detail EUV can print</p>
+  <div class="hbars is-computer">
+    <div class="hbar"><span>Standard EUV (NA 0.33)</span><span class="hbar-val">13 nm</span><span class="hbar-track"><span class="hbar-fill" style="width:100%"></span></span></div>
+    <div class="hbar alt"><span>High-NA EUV (NA 0.55) [R10]</span><span class="hbar-val">8 nm</span><span class="hbar-track"><span class="hbar-fill" style="width:61.5%"></span></span></div>
+  </div>
+<details class="more"><summary>Read the details</summary><div class="more-body">
+  <ul>
+    <li>Adapted for silicon at Bell Labs in <b>1955</b> (Jules Andrus and Walter Bond), borrowing from photoengraving.[R8]</li>
+    <li>How it works: coat the wafer with a light-sensitive resist, shine light through a patterned mask, develop the resist, then etch or dope through the openings.[R8]</li>
+    <li>Shorter light wavelengths can print finer patterns:
+      <ul>
+        <li><b>DUV (deep ultraviolet):</b> 248 nm and 193 nm lasers.[R9]</li>
+        <li><b>EUV (extreme ultraviolet):</b> 13.5 nm light, more than 14× shorter.[R9]
+          <ul>
+            <li>EUV light is made by hitting molten tin droplets (about 25 µm across) with a laser twice: once to flatten each droplet, once to turn it into a glowing plasma. This happens 50,000 times a second.[R9]</li>
+            <li>Air absorbs EUV, so the whole light path is in a vacuum, and it uses mirrors instead of lenses.[R10]</li>
+          </ul></li>
+        <li><b>Resolution:</b> standard EUV (numerical aperture 0.33) resolves 13 nm. <b>High-NA EUV</b> (NA 0.55) resolves 8 nm.[R10]</li>
+      </ul></li>
+  </ul>
+
+</div></details>
+
+  <div class="callout status">
+    <span class="callout-title">Status: High-NA EUV (as of October 2026)</span>
+    <ul>
+      <li>ASML shipped the first High-NA system in December 2023.[R10]</li>
+      <li>By early 2026, Intel, SK hynix and Samsung had High-NA tools, and the research center imec received one on 18 March 2026.[R11][R12]</li>
+      <li>Reuters estimates that fewer than a dozen exist, at roughly <b>$400 million</b> each. That's an estimate, not an ASML list price.[R11]</li>
+    </ul>
+  </div>
+
+  <h3>What "2 nm" means, and doesn't</h3>
+  <p class="tldr is-computer">"3 nm", "2 nm" and "18A" are generation labels, not measurements.[R13][R14]</p>
+  <blockquote class="pull">"I can't point to the one dimension that's 32 nm or 22 nm or 14 nm." <cite>Mark Bohr, Intel [R13]</cite></blockquote>
+<details class="more"><summary>Read the details</summary><div class="more-body">
+  <ul>
+    <li><b>Settled:</b> node names like "3 nm", "2 nm" and "18A" are <b>generation labels, not measurements</b>.[R13][R14]
+      <ul>
+        <li>Intel's Mark Bohr: "I can't point to the one dimension that's 32 nm or 22 nm or 14 nm."[R13]</li>
+        <li>By the early 2000s, the node number had "nothing to do with any dimension that you can find on the die" (Paolo Gargini, former chair of the industry roadmap).[R14]</li>
+      </ul></li>
+    <li><b>Real dimensions, for scale:</b>
+      <ul>
+        <li>Intel's "22 nm" FinFET had a 26 nm gate length and 8 nm-wide fins.[R14]</li>
+        <li>The "5 nm" node has a contacted gate pitch (spacing between gates) of 48 nm and a metal pitch of 36 nm.[R14]</li>
+        <li>Intel <b>18A</b> (marketed as 1.8 nm-class) has a contacted gate pitch of <b>50 nm</b>, more than 25× the name.[R15]</li>
+      </ul></li>
+    <li>Industry veterans have proposed describing chips by real numbers instead: gate pitch, metal pitch, and number of stacked layers of devices.[R14]</li>
+  </ul>
+
+</div></details>
+
+  <div class="module is-computer" id="t2" aria-labelledby="t2-title">
+    <div class="module-head"><span class="module-id">T2</span><h3 id="t2-title">Name vs. ruler</h3></div>
+    <p class="goal">Don't read "2 nm" as a physical size.</p>
+    <div class="module-body"><p class="noscript">This demo needs JavaScript.</p></div>
+    <div class="callout leaves-out"><span class="callout-title">What this leaves out</span>A chip has many different dimensions; only the sourced ones are shown.</div>
+  </div>
+</section>
+
+<!-- ============ D3 ============ -->
+<section id="gates" class="page-section">
+  <p class="eyebrow">D3</p>
+  <h2>From transistors to gates</h2>
+
+  <h3>Two kinds of transistor, working in pairs (CMOS)</h3>
+  <ul>
+    <li>Modern chips use <b>CMOS</b>: every gate has a <b>pull-up network</b> of PMOS transistors (connects the output to 1) and a <b>pull-down network</b> of NMOS transistors (connects the output to 0).[R16]</li>
+    <li>The two networks are mirror images: transistors in series in one are in parallel in the other.[R16]</li>
+    <li>A single CMOS stage always <b>inverts</b>: a high input pulls the output low.[R16]
+      <ul>
+        <li>So the natural one-stage gates are <b>NOT, NAND and NOR</b>.</li>
+        <li><b>AND</b> and <b>OR</b> need a second stage: a NAND or NOR followed by a NOT.[R19][R20]</li>
+      </ul></li>
+  </ul>
+
+  <div class="module is-computer" id="t3" aria-labelledby="t3-title">
+    <div class="module-head"><span class="module-id">T3</span><h3 id="t3-title">Build-a-gate</h3></div>
+    <p class="goal">See which transistors are on for each input, and why NAND/NOR are the natural 4-transistor gates.</p>
+    <div class="module-body"><p class="noscript">This demo needs JavaScript.</p></div>
+    <div class="callout leaves-out"><span class="callout-title">What this leaves out</span>Real gates have timing, power and sizing concerns; transistors are drawn as ideal switches.</div>
+  </div>
+
+  <h3>Real transistor counts (standard static CMOS)</h3>
+  <div class="tcount" role="list">
+    <div class="tc-row" role="listitem"><span>NOT</span><span class="tc-boxes"><i></i><i></i><span>2</span></span></div>
+    <div class="tc-row" role="listitem"><span>NAND, NOR</span><span class="tc-boxes"><i></i><i></i><i></i><i></i><span>4</span></span></div>
+    <div class="tc-row" role="listitem"><span>AND, OR</span><span class="tc-boxes"><i></i><i></i><i></i><i></i><i></i><i></i><span>6</span></span></div>
+    <div class="tc-row" role="listitem"><span>SRAM bit</span><span class="tc-boxes"><i></i><i></i><i></i><i></i><i></i><i></i><span>6</span></span></div>
+    <div class="tc-row" role="listitem"><span>XOR</span><span class="tc-boxes"><i></i><i></i><i></i><i></i><i></i><i></i><i class="opt"></i><i class="opt"></i><i class="opt"></i><i class="opt"></i><i class="opt"></i><i class="opt"></i><span>6, 8 or 12</span></span></div>
+  </div>
+  <p class="small muted">One square = one transistor. Dashed: depends on circuit style. Sources in the table.</p>
+<details class="more"><summary>Read the details</summary><div class="more-body">
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Gate</th><th>Transistors</th><th>How</th></tr></thead>
+      <tbody>
+        <tr><td>NOT</td><td><b>2</b></td><td>1 PMOS + 1 NMOS [R16]</td></tr>
+        <tr><td>NAND (2-input)</td><td><b>4</b></td><td>2 NMOS in series, 2 PMOS in parallel [R17]</td></tr>
+        <tr><td>NOR (2-input)</td><td><b>4</b></td><td>2 NMOS in parallel, 2 PMOS in series [R18]</td></tr>
+        <tr><td>AND (2-input)</td><td><b>6</b></td><td>NAND (4) + NOT (2) [R19][R20]</td></tr>
+        <tr><td>OR (2-input)</td><td><b>6</b></td><td>NOR (4) + NOT (2) [R19]</td></tr>
+        <tr><td>XOR (2-input)</td><td><b>6, 8 or 12</b></td><td>depends on circuit style [R21][R22]</td></tr>
+        <tr><td>SRAM memory cell (1 bit)</td><td><b>6</b></td><td>two cross-coupled inverters (4) + 2 access transistors [R23]</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div></details>
+
+  <div class="callout myth">
+    <span class="callout-title">"Are transistors always grouped in 4?"</span>
+    <p><b>No.</b> But the idea has two real roots:</p>
+    <ol>
+      <li>The two most basic gates, <b>NAND and NOR, are exactly 4 transistors each.</b>[R17][R18]</li>
+      <li>The classic logic chip, the 7400 family, puts <b>four NAND gates in one package</b>. TI's SN74HC00 is literally named "Quadruple 2-Input NAND Gates."[R24]</li>
+    </ol>
+    <p>Counter-examples: NOT is 2, AND/OR are 6, an SRAM cell is 6, XOR is 6–12.</p>
+  </div>
+</section>
+
+<!-- ============ D4 ============ -->
+<section id="all-gates" class="page-section">
+  <p class="eyebrow">D4</p>
+  <h2>Every possible gate</h2>
+  <p><b>Outputs are always exactly 0 or 1.</b> Each gate's whole behavior fits in a small table.[R25]</p>
+
+  <div class="table-scroll truth-wide">
+    <table>
+      <thead><tr><th>A</th><th>B</th><th>AND</th><th>OR</th><th>NAND</th><th>NOR</th><th>XOR</th><th>XNOR</th></tr></thead>
+      <tbody>
+        <tr><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>0</td><td>1</td></tr>
+        <tr><td>0</td><td>1</td><td>0</td><td>1</td><td>1</td><td>0</td><td>1</td><td>0</td></tr>
+        <tr><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td><td>0</td><td>1</td><td>0</td></tr>
+        <tr><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="table-scroll truth-narrow">
+    <table>
+      <thead><tr><th>A</th><th>NOT A</th></tr></thead>
+      <tbody><tr><td>0</td><td>1</td></tr><tr><td>1</td><td>0</td></tr></tbody>
+    </table>
+  </div>
+  <div class="stats is-computer">
+    <div class="stat"><b>16</b><span>possible 2-input gates: 2⁴ tables [R26]</span></div>
+    <div class="stat"><b>1</b><span>gate type is enough: NAND (or NOR) builds them all [R20][R25]</span></div>
+  </div>
+  <ol class="vtl is-computer">
+    <li><span class="yr">~1880</span>Charles Sanders Peirce discovers it (published only in 1933).[R26]</li>
+    <li><span class="yr">1913</span>Henry Sheffer publishes it, though his "stroke" meant NOR.[R26][R27]</li>
+    <li><span class="yr">1917</span>Jean Nicod uses it for NAND, the meaning used today.[R27]</li>
+  </ol>
+  <details class="more"><summary>Read the details</summary><div class="more-body">
+  <ul>
+    <li>In plain words:
+      <ul>
+        <li><b>AND:</b> 1 only if both inputs are 1.</li>
+        <li><b>OR:</b> 1 if either is.</li>
+        <li><b>NAND / NOR:</b> the opposite of AND / OR.</li>
+        <li><b>XOR</b> ("exclusive or"): 1 if the inputs <i>differ</i>.</li>
+        <li><b>XNOR:</b> 1 if they're the <i>same</i>.</li>
+      </ul></li>
+    <li><b>How many 2-input gates are possible? 16.</b> A 2-input table has 4 rows, and each row's output can be 0 or 1, so there are 2⁴ = 16 possible tables. Logicians count the same 16 "binary connectives".[R26] Only some have common names. Others include "always 0", "always 1", "just A", and "A AND NOT B".</li>
+    <li><b>NAND can build everything.</b> Any logic function can be made from NAND gates alone, and the same goes for NOR.[R20][R25] For example:
+      <ul>
+        <li>NOT A = A NAND A</li>
+        <li>A AND B = NOT (A NAND B)</li>
+        <li>A OR B = (NOT A) NAND (NOT B)</li>
+      </ul></li>
+    <li><b>History:</b>
+      <ul>
+        <li>Charles Sanders Peirce discovered this around <b>1880</b>, but it was only published in 1933.[R26]</li>
+        <li>Henry Sheffer published it in <b>1913</b>, though his "stroke" meant NOR.[R26][R27]</li>
+        <li>Jean Nicod used it for NAND in 1917, the meaning used today.[R27]</li>
+      </ul></li>
+  </ul>
+
+</div></details>
+
+  <div class="module is-computer" id="t4" aria-labelledby="t4-title">
+    <div class="module-head"><span class="module-id">T4</span><h3 id="t4-title">Truth-table explorer</h3></div>
+    <p class="goal">There are exactly 16 possible rules, outputs are always 0 or 1, and NAND alone can make all of them.</p>
+    <div class="module-body"><p class="noscript">This demo needs JavaScript.</p></div>
+    <div class="callout leaves-out"><span class="callout-title">What this leaves out</span>Gates with more than 2 inputs. The NAND-only builds were worked out for this page and are checked against each truth table as the page runs; they are not the most efficient transistor-level designs.</div>
+  </div>
+
+  <aside class="callout definition owner-aside">
+    <span class="callout-title">Aside: why this site is called NANDalogic</span>
+    <p>One humble rule, repeated enough times, builds everything else.</p>
+    <p><span class="todo">TODO: Josh writes this aside</span></p>
+  </aside>
+</section>
+
+<!-- ============ D5 ============ -->
+<section id="adders-memory" class="page-section">
+  <p class="eyebrow">D5</p>
+  <h2>Gates that add and gates that remember</h2>
+
+  <h3>Adding with gates</h3>
+  <p class="tldr is-computer">Half adder: Sum = A XOR B, Carry = A AND B. Chain full adders and the carry "ripples" along.[R28]</p>
+  <details class="more"><summary>Read the details</summary><div class="more-body">
+  <ul>
+    <li><b>Half adder:</b> adds two bits. <b>Sum = A XOR B, Carry = A AND B.</b>[R28]</li>
+  </ul>
+  <div class="table-scroll truth-narrow">
+    <table>
+      <thead><tr><th>A</th><th>B</th><th>Carry</th><th>Sum</th></tr></thead>
+      <tbody>
+        <tr><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+        <tr><td>0</td><td>1</td><td>0</td><td>1</td></tr>
+        <tr><td>1</td><td>0</td><td>0</td><td>1</td></tr>
+        <tr><td>1</td><td>1</td><td>1</td><td>0</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="small muted">(1 + 1 = 10 in binary: sum 0, carry 1.)</p>
+  <ul>
+    <li><b>Full adder:</b> adds two bits plus an incoming carry. It's two half adders plus an OR gate.[R28]</li>
+    <li><b>Ripple-carry adder:</b> chain full adders, and each carry "ripples" to the next. It's simple, but slower than cleverer designs (carry-lookahead) used in real chips.[R28]</li>
+  </ul>
+
+</div></details>
+
+  <div class="module is-computer" id="t5" aria-labelledby="t5-title">
+    <div class="module-head"><span class="module-id">T5</span><h3 id="t5-title">4-bit adder</h3></div>
+    <p class="goal">Arithmetic is just gates, and carries ripple.</p>
+    <div class="module-body"><p class="noscript">This demo needs JavaScript.</p></div>
+    <div class="callout leaves-out"><span class="callout-title">What this leaves out</span>Real CPUs use faster adder designs (carry-lookahead); no timing delays are shown.</div>
+  </div>
+
+  <h3>Remembering with gates</h3>
+  <ul>
+    <li>Feed two gates' outputs back into each other, and the circuit has <b>two stable states</b>: it holds one bit.[R29]
+      <ul><li>Claude Shannon, 1948: "A device with two stable positions, such as a relay or a flip-flop circuit, can store one bit of information."[R30]</li></ul></li>
+    <li><b>SR latch:</b> two cross-coupled NOR (or NAND) gates. "Set" stores a 1 and "Reset" stores a 0. Pressing both at once is forbidden.[R29]</li>
+    <li><b>D latch / flip-flop:</b> stores whatever is on the data input. A latch passes the input through while enabled; a flip-flop grabs it only on a clock tick.[R29]</li>
+  </ul>
+
+  <div class="module is-computer" id="t6" aria-labelledby="t6-title">
+    <div class="module-head"><span class="module-id">T6</span><h3 id="t6-title">SR latch</h3></div>
+    <p class="goal">Feedback lets gates <i>remember</i> one bit.</p>
+    <div class="module-body"><p class="noscript">This demo needs JavaScript.</p></div>
+    <div class="callout leaves-out"><span class="callout-title">What this leaves out</span>Real memory uses SRAM/DRAM cells and clocked flip-flops; no timing is shown.</div>
+  </div>
+
+  <div class="split">
+    <div class="side is-computer"><span class="tag">SRAM</span><p class="tc-boxes" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><span>6 per bit</span></p><p>6 transistors per bit, holds its value while powered, fast but takes more chip area.[R23]</p></div>
+    <div class="side is-computer"><span class="tag">DRAM</span><p class="tc-boxes" aria-hidden="true"><i></i><span class="cap">⊣⊢</span><span>1 + capacitor · leaks</span></p><p>1 transistor + 1 tiny capacitor per bit. The charge slowly leaks, so it must be refreshed constantly. It's denser and cheaper per bit.[R31]</p></div>
+  </div>
+</section>
+
+<!-- ============ D6 ============ -->
+<section id="bits-bytes" class="page-section">
+  <p class="eyebrow">D6</p>
+  <h2>Bits and bytes</h2>
+  <p class="tldr is-computer">A byte is 8 bits, so it holds 2⁸ = 256 values (0–255). The playground below shows how.[R33]</p>
+  <ol class="vtl is-computer">
+    <li><span class="yr">1948</span><b>"Bit"</b> first in print, in Shannon's paper, credited to John Tukey.[R30]</li>
+    <li><span class="yr">1956</span><b>"Byte"</b> coined by Werner Buchholz at IBM, from "bite". 8-bit bytes adopted for Stretch.[R32]</li>
+    <li><span class="yr">1963</span><b>ASCII:</b> 7-bit code, 128 characters. "A" = 65.[R51]</li>
+    <li><span class="yr">mid-1960s</span><b>IBM System/360</b> spreads the 8-bit byte "far and wide".[R32]</li>
+    <li><span class="yr">Sep 2026</span><b>Unicode 18.0:</b> 172,808 characters; its first 128 match ASCII.[R52][R41]</li>
+  </ol>
+  <details class="more"><summary>Read the details</summary><div class="more-body">
+  <ul>
+    <li><b>Bit = binary digit</b>, one 0 or 1. The word first appeared in print in Claude Shannon's 1948 paper, which credits it to John Tukey: "binary digits, or more briefly bits, a word suggested by J. W. Tukey."[R30]</li>
+    <li><b>Byte:</b> coined by Werner Buchholz at IBM in <b>1956</b> while designing the Stretch computer. It was "coined from 'bite', but respelled to avoid accidental mutation to 'bit'."[R32]
+      <ul>
+        <li>Early bytes ranged from 1 to 6 bits. 8-bit bytes were adopted for Stretch later in 1956.[R32]</li>
+        <li>IBM's <b>System/360</b> spread the 8-bit byte "far and wide in the mid-1960s."[R32] Bytes from 1 to 48 bits have been used; "octet" means exactly 8.[R33]</li>
+      </ul></li>
+    <li><b>One byte holds 2⁸ = 256 values (0–255).</b>[R33]</li>
+    <li><b>How bits become numbers (place value):</b> each position is worth double the one to its right: 128, 64, 32, 16, 8, 4, 2, 1. Add up the positions holding a 1.[R34]
+      <ul><li>Example: 0100 0001 = 64 + 1 = <b>65</b>.</li></ul></li>
+    <li><b>Hexadecimal</b> (base 16, digits 0–9 and A–F) is shorthand: one hex digit = 4 bits, so a byte is two hex digits, 00 to FF.[R35] 65 = <b>0x41</b>.</li>
+  </ul>
+
+</div></details>
+
+  <div class="module is-computer" id="t7" aria-labelledby="t7-title">
+    <div class="module-head"><span class="module-id">T7</span><h3 id="t7-title">Byte playground</h3></div>
+    <p class="goal">A byte is 8 switches, and the same bits can be read as a number or a letter.</p>
+    <div class="module-body"><p class="noscript">This demo needs JavaScript.</p></div>
+    <div class="callout leaves-out"><span class="callout-title">What this leaves out</span>Characters beyond 127 use multi-byte encodings (UTF-8), so for those the demo shows a note instead of a character.</div>
+  </div>
+</section>
+
+<!-- ============ D7 ============ -->
+<section id="keypress" class="page-section">
+  <p class="eyebrow">D7</p>
+  <h2>From keypress to pixel</h2>
+  <p>Follow the capital letter <b>A</b>, typed with Shift.</p>
+
+  <div class="module is-computer" id="t8" aria-labelledby="t8-title">
+    <div class="module-head"><span class="module-id">T8</span><h3 id="t8-title">Keypress-to-pixel pipeline</h3></div>
+    <p class="goal">A letter on screen is a chain of codes and transistors from finger to light.</p>
+    <div class="module-body"><p class="noscript">This demo needs JavaScript. All 12 steps are listed below.</p></div>
+    <div class="callout leaves-out"><span class="callout-title">What this leaves out</span>This shows a USB keyboard on Windows; other systems differ in details. Real steps overlap and take microseconds to milliseconds; no timings are shown, since none are sourced.</div>
+  </div>
+
+  <details class="steps-text">
+    <summary>All 12 steps as text</summary>
+    <ol>
+      <li><b>Key switch → circuit.</b> Keys sit on a grid of row and column wires. Pressing a key connects one row to one column.[R36]</li>
+      <li><b>The keyboard scans.</b> Its tiny processor energizes the columns one at a time and reads all the rows, many times a second, to see which junctions are connected. Diodes stop false "ghost" presses.[R36]</li>
+      <li><b>The keyboard sends a code, not a letter.</b> It reports <i>which key</i> is down, not what character it means.[R37]</li>
+      <li><b>Over USB:</b> a standard keyboard report is 8 bytes: one for modifier keys (Shift, Ctrl…), one reserved, and up to six key codes.[R38] The "A" key is <b>usage 0x04</b>, and Left Shift is <b>0xE1</b>.[R39]</li>
+      <li><b>The OS applies your keyboard layout.</b> The operating system turns the key code into a character, taking Shift and Caps Lock into account. The layout decides which character each key produces.[R40]</li>
+      <li><b>The character code:</b> "A" is Unicode <b>U+0041</b>, "LATIN CAPITAL LETTER A".[R41] That's decimal <b>65</b>, binary <b>0100 0001</b>. In UTF-8 (the web's standard encoding), it's stored as that single byte.[R42]</li>
+      <li><b>The app receives the character</b> and inserts it into the text. (On Windows, as a <code>WM_CHAR</code> message.)[R40]</li>
+      <li><b>Font lookup:</b> the font's character map (<code>cmap</code> table) maps the code to a <b>glyph</b>, the font's drawing of "A".[R43] Glyphs are outlines made of curves (quadratic Bézier curves in TrueType fonts).[R44]</li>
+      <li><b>Rasterize:</b> the outline is converted to pixels, lighting the pixels whose centers fall inside the shape. <b>Anti-aliasing</b> uses in-between shades on the edges so the letter looks smooth.[R45][R46]</li>
+      <li><b>Framebuffer:</b> the finished image of the whole screen sits in memory as a grid of pixel values.[R47]</li>
+      <li><b>Refresh:</b> the display redraws from that image many times a second, commonly <b>60 or 120 times per second (Hz)</b>.[R48]</li>
+      <li><b>Light:</b> each pixel is made of red, green and blue subpixels. In an <b>LCD</b>, a backlight shines through, and <b>one thin-film transistor per pixel</b> controls how much light gets through.[R49] In an <b>OLED</b>, each pixel makes its own light, controlled by at least two thin-film transistors, and black pixels switch fully off.[R50] So the last step is transistors too.</li>
+    </ol>
+  </details>
+
+  <details class="more"><summary>Background: ASCII and Unicode</summary><div class="more-body">
+  <ul>
+    <li><b>ASCII</b> was first published in <b>1963</b>. It was a 7-bit code with 128 characters (33 control, 95 printable). It was revised in 1967.[R51]</li>
+    <li><b>Unicode</b> extends this to every writing system. <b>Version 18.0</b>, released 16 September 2026, has <b>172,808 characters</b>.[R52] Unicode's first 128 codes match ASCII, which is why "A" is 65 in both.[R41][R42]</li>
+  </ul>
+</div></details>
+</section>
+
+<!-- ============ D8 ============ -->
+<section id="history" class="page-section">
+  <p class="eyebrow">D8</p>
+  <h2>How long has this been going on?</h2>
+
+  <div class="module is-computer" id="t9" aria-labelledby="t9-title">
+    <div class="module-head"><span class="module-id">T9</span><h3 id="t9-title">Timeline of switches</h3></div>
+    <p class="goal">Feel the scale of growth, from thousands of switches to trillions in 85 years.</p>
+    <div class="module-body"><p class="noscript">This demo needs JavaScript. The same data is in the table below.</p></div>
+    <div class="callout leaves-out"><span class="callout-title">What this leaves out</span>Relays and tubes aren't directly comparable to transistors, and chips of different types (CPU, GPU, wafer-scale) are mixed.</div>
+  </div>
+
+  <details>
+    <summary>The timeline as a table</summary>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>When</th><th>Milestone</th><th>Switches</th></tr></thead>
+        <tbody>
+          <tr><td>1941</td><td>Zuse Z3</td><td>2,300 <b>relays</b> (electromagnetic switches) [R53]</td></tr>
+          <tr><td>1944</td><td>Harvard Mark I</td><td>3,500 relays [R53]</td></tr>
+          <tr><td>1945–46</td><td>ENIAC</td><td>more than 17,000 <b>vacuum tubes</b> [R54]</td></tr>
+          <tr><td>Dec 1947</td><td>First transistor (point-contact, germanium), Bardeen and Brattain, Bell Labs</td><td>1 [R55]</td></tr>
+          <tr><td>1954</td><td>First silicon transistors</td><td>[R96]</td></tr>
+          <tr><td>1958</td><td>First integrated circuit (Kilby, TI)</td><td>[R56]</td></tr>
+          <tr><td>1959</td><td>Practical silicon integrated circuit, patent filed (Noyce, Fairchild)</td><td>[R57]</td></tr>
+          <tr><td>1959–60</td><td>MOSFET (Atalla and Kahng, Bell Labs)</td><td>[R58]</td></tr>
+          <tr><td>1971</td><td>Intel 4004, first microprocessor (built for a Busicom calculator)</td><td>2,300 transistors [R60]</td></tr>
+          <tr><td>1978</td><td>Intel 8086</td><td>29,000 [R61]</td></tr>
+          <tr><td>1982</td><td>Intel 80286</td><td>134,000 [R61]</td></tr>
+          <tr><td>1985</td><td>Intel 80386</td><td>275,000 [R61]</td></tr>
+          <tr><td>1989</td><td>Intel 486, first x86 chip over 1 million</td><td>1.2 million [R61]</td></tr>
+          <tr><td>1993</td><td>Intel Pentium</td><td>3.1 million [R61]</td></tr>
+          <tr><td>2006</td><td>Intel Itanium 2 "Montecito"</td><td>1.72 billion [R62]</td></tr>
+          <tr><td>2022</td><td>NVIDIA H100</td><td>80 billion [R66]</td></tr>
+          <tr><td>2024</td><td>NVIDIA Blackwell (two dies)</td><td>208 billion [R63]</td></tr>
+          <tr><td>2024</td><td>Cerebras WSE-3 (a whole wafer as one chip)</td><td>4 trillion [R65]</td></tr>
+          <tr><td>2026</td><td>NVIDIA Rubin GPU (announced Jan 2026, two dies)</td><td>336 billion [R64]</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <ul>
+    <li><b>Moore's law:</b> in 1965, Gordon Moore predicted components per chip would double every year. In 1975 he revised this to <b>every two years</b>.[R59]</li>
+    <li><b>Not one invention but a stack:</b>
+      <ul>
+        <li>the switch (relay → tube → transistor)</li>
+        <li>putting many switches on one chip (the integrated circuit)</li>
+        <li>shrinking them (lithography)</li>
+      </ul></li>
+  </ul>
+  <div class="callout status">
+    <span class="callout-title">Status (as of October 2026)</span>
+    Transistor counts above are the latest published figures found. Apple's newest chips (M6, Aug 2026) don't have published counts.[R95]
+  </div>
+</section>
+
+<!-- ============ D9 ============ -->
+<section id="simpler-devices" class="page-section">
+  <p class="eyebrow">D9</p>
+  <h2>Is my microwave different?</h2>
+
+  <h3>Mostly the same logic, just far fewer transistors</h3>
+  <div class="cards">
+    <div class="card is-computer"><span class="tag">Microcontrollers</span><p>A whole small computer on one chip. TI's 4-bit <b>TMS1000</b> (1974, about $2 in volume) went into toys like the Speak &amp; Spell. Microcontrollers now control microwave ovens and are found in large numbers in appliances and cars.[R67]</p></div>
+    <div class="card is-computer"><span class="tag">8-bit microcontrollers</span><p>Run washing machines, thermostats, smoke detectors and toasters.[R68]</p></div>
+    <div class="card is-computer"><span class="tag">Cars</span><p>Many modern cars have upwards of <b>100</b> electronic control units.[R70]</p></div>
+    <div class="card is-computer"><span class="tag">Apollo Guidance Computer</span><p>Built in the 1960s from thousands of simple chips, each holding <b>3-input NOR gates</b>.[R72][R73] A real-world "build everything from one gate" machine.</p></div>
+  </div>
+
+  <h3>Genuinely different</h3>
+  <div class="cards">
+    <div class="card different"><span class="tag">Mechanical thermostat</span><p>A <b>bimetallic strip</b> (two metals that expand at different rates) curls as the temperature changes and physically touches a contact to switch the furnace on. The strip is both the sensor and the switch. There are no transistors and no logic.[R69]</p></div>
+    <div class="card different"><span class="tag">Analog electronics</span><p>Signals vary continuously (like a dimmer) instead of jumping between two values. Two-state (digital) operation is "far more reliable" than many-valued analog operation.[R71]</p></div>
+  </div>
+</section>
+
+<!-- ============ D10 ============ -->
+<section id="quantum" class="page-section is-quantum">
+  <p class="eyebrow">D10</p>
+  <h2>Quantum computing: a different kind of bit</h2>
+
+  <h3>What a qubit is</h3>
+  <ul>
+    <li>Like a bit, a qubit can be 0 or 1. It can also be in a <b>superposition</b>, described by two numbers called <b>amplitudes</b>, one for 0 and one for 1.[R74][R75]</li>
+    <li><b>Amplitudes are not probabilities.</b> They can be negative (and, more generally, complex numbers).[R75][R76]</li>
+    <li><b>Measuring gives one ordinary result</b>, 0 or 1. If you just put a qubit register into an equal superposition of all answers and measure it, you get a random answer.[R75]</li>
+  </ul>
+
+  <h3>Interference: the engine</h3>
+  <ul>
+    <li>Amplitudes combine like waves. Some reinforce and some cancel.[R74][R76]</li>
+    <li>A quantum algorithm is a carefully choreographed sequence that makes the amplitudes of <b>wrong answers cancel</b> and the right answer's reinforce.[R75]</li>
+  </ul>
+
+  <div class="module is-quantum" id="t10" aria-labelledby="t10-title">
+    <div class="module-head"><span class="module-id">T10</span><h3 id="t10-title">Interference demo</h3></div>
+    <p class="goal">Amplitudes can cancel, and that cancellation, not "trying everything", is what quantum algorithms exploit.</p>
+    <div class="module-body"><p class="noscript">This demo needs JavaScript.</p></div>
+    <div class="callout leaves-out"><span class="callout-title">What this leaves out</span>This is one qubit (no entanglement), and ordinary light waves interfere the same way, so it shows the <i>amplitude rule</i>, not where speedup comes from. Real amplitudes are complex numbers (phases). The photon is never split: it's always detected whole, at one place.[R93]</div>
+  </div>
+
+  <h3>Entanglement</h3>
+  <ul>
+    <li>Entangled qubits have linked outcomes: measuring one tells you about the others.[R74]</li>
+    <li>It is "correlation without communication". It can't be used to send messages faster than light.[R77][R78]</li>
+  </ul>
+
+  <div class="callout myth">
+    <span class="callout-title">Myth: "A quantum computer tries every answer at once."</span>
+    <ul>
+      <li>False. "Quantum computers won't solve hard problems instantly by just trying all solutions in parallel" (Scott Aaronson, quantum computing researcher).[R79]</li>
+      <li>He calls the "both 0 and 1 at the same time" framing "the fundamental misstep of quantum computing popularization."[R75]</li>
+      <li>The power comes from interference, and it only works for problems with the right mathematical structure.</li>
+    </ul>
+  </div>
+
+  <h3>What it's good for, and not</h3>
+  <ul class="rating">
+    <li><span class="badge good">Strongest case</span><p><b>Simulating molecules and materials</b>Probably the most important known application.[R76][R74]</p></li>
+    <li><span class="badge good">Yes, in future</span><p><b>Factoring large numbers</b>Shor's algorithm (1994) would break today's RSA encryption.[R75]</p></li>
+    <li><span class="badge loose">Small gain</span><p><b>Searching unsorted data</b>Grover's algorithm: √N steps instead of N, provably the best possible.[R81]</p></li>
+    <li><span class="badge loose">Possibly</span><p><b>Optimization and machine learning</b>"Possibly" (IBM). Experts expect help "only modestly, if at all" for many problems.[R74][R75]</p></li>
+    <li><span class="badge weak">No</span><p><b>Everyday computing</b>Email, games, browsing: classical computers stay the best tool.[R74]</p></li>
+  </ul>
+  <h3>Where things stand <span class="muted small">(as of October 2026)</span></h3>
+  <p class="small muted">Tap a tile for the details.</p>
+  <div class="tiles is-quantum">
+    <details class="tile"><summary><span class="tile-kicker">Qubit counts</span><span class="tile-big">~100</span><span class="tile-head">high-quality qubits in the best machines</span><span class="tile-more">details</span></summary>
+      <div class="more-body"><ul><li>Big counts mislead: Caltech held 6,100 atom qubits in an array in 2025, but they weren't entangled or computing.[R84]</li><li>The best machines run on roughly 100 high-quality physical qubits.</li></ul></div></details>
+    <details class="tile"><summary><span class="tile-kicker">Error correction</span><span class="tile-big">Works</span><span class="tile-head">but only at small scale</span><span class="tile-more">details</span></summary>
+      <div class="more-body"><ul><li>Many error-prone <b>physical</b> qubits are grouped into one more reliable <b>logical</b> qubit. This only helps if errors are below a threshold.[R82]</li><li>Google's Willow chip (Dec 2024) was the first to show errors <i>shrinking</i> as the code grew.[R83][R82]</li><li>Harvard/MIT/QuEra (Nov 2025) demonstrated a fault-tolerant architecture with up to 448 atoms.[R94]</li><li>Quantinuum reported a record logical fidelity in Oct 2026 (company claim).[R89]</li></ul></div></details>
+    <details class="tile"><summary><span class="tile-kicker">"Quantum advantage"</span><span class="tile-big">Contested</span><span class="tile-head">narrow claims, no useful advantage yet</span><span class="tile-more">details</span></summary>
+      <div class="more-body"><ul><li>Google's "Quantum Echoes" (Oct 2025, peer-reviewed) claimed ~13,000× over classical.[R85]</li><li>IBM and UChicago claimed advantage on 70 logical qubits (Jul 2026).[R86] A classical team reproduced that result in about 37 minutes on 256 GPUs weeks later.[R87]</li><li>There's no consensus yet on a <i>useful</i> quantum advantage.</li></ul></div></details>
+    <details class="tile"><summary><span class="tile-kicker">Roadmaps</span><span class="tile-big">2029</span><span class="tile-head">target dates: plans, not results</span><span class="tile-more">details</span></summary>
+      <div class="more-body"><ul><li>IBM's "Starling": 200 logical qubits by 2029.[R88]</li><li>Quantinuum: a fault-tolerant machine "by 2029".[R89]</li></ul></div></details>
+    <details class="tile wide"><summary><span class="tile-kicker">Real impact today: encryption</span><span class="tile-big">RSA out by 2035</span><span class="tile-head">NIST's plan: deprecated after 2030, disallowed after 2035</span><span class="tile-more">details</span></summary>
+      <div class="more-body"><ul><li>NIST finalized the first post-quantum encryption standards in August 2024.[R90]</li><li>Its October 2026 transition plan deprecates RSA and similar schemes after 2030 and disallows them after 2035.[R91]</li><li>Estimates suggest breaking RSA-2048 would take under 1 million noisy qubits running for under a week (Gidney 2025, an estimate).[R92] That is far beyond today's machines.</li></ul></div></details>
+  </div>
+</section>
+
+<!-- ============ D11 ============ -->
+<section id="self-check" class="page-section">
+  <p class="eyebrow">D11</p>
+  <h2>Self-check</h2>
+  <p>Progress is saved on this device only.</p>
+  <div class="module" id="t11" aria-labelledby="t11-title">
+    <div class="module-head"><span class="module-id">T11</span><h3 id="t11-title">Match and quiz</h3></div>
+    <p class="goal">Lock in the key numbers and ideas.</p>
+    <div class="module-body"><p class="noscript">This demo needs JavaScript.</p></div>
+  </div>
+</section>
+
+<!-- ============ D12 ============ -->
+<section id="back" class="page-section">
+  <p class="eyebrow">D12</p>
+  <h2>Back to the model</h2>
+  <div class="side is-brain">
+    <span class="tag">On the ladder</span>
+    <p>The transistor is the computer side of stage 3, "smallest switch", paired with the ion channel. Gates and AI "neurons" sit at stage 5, where the analogy with a real neuron is weak.</p>
+    <p><a href="/brain-vs-computer/#model">← Back to the matter-to-thought ladder</a></p>
+  </div>
+
+  <h3>What this page simplifies</h3>
+  <ol class="small">
+    <li><b>Transistors as ideal switches.</b> Real ones turn on gradually and leak slightly when off.</li>
+    <li><b>The T1 cross-section is a 2D sketch.</b> Modern transistors are 3D fins or nanosheets.</li>
+    <li><b>Gate transistor counts are for standard static CMOS.</b> Other circuit styles use different counts (e.g., XOR can be 6, 8 or 12).[R21]</li>
+    <li><b>AND = 6 and OR = 6</b> are sums of sourced parts (a NAND or NOR plus an inverter), the standard construction.[R19][R20]</li>
+    <li><b>The keypress chain shows a USB keyboard on Windows.</b> Other operating systems differ in details.</li>
+    <li><b>Ripple-carry is the teaching adder.</b> Real processors use faster designs.[R28]</li>
+    <li><b>The interference demo (T10) is one qubit.</b> It shows the amplitude rule, not entanglement or the source of quantum speedup. Real amplitudes are complex numbers.</li>
+    <li><b>Status boxes are snapshots dated October 2026.</b> Transistor counts, High-NA EUV and quantum status change fast.</li>
+    <li><b>Estimates are labeled:</b> the ~$400M High-NA price, "fewer than a dozen" High-NA tools, the RSA-2048 qubit estimate, and 100+ car ECUs are estimates or approximate figures.</li>
+    <li><b>Wikipedia is a secondary source</b> for some logic facts (XOR counts, flip-flops, framebuffer, refresh rates, display types). These are marked (WP) in the reference list.</li>
+  </ol>
+</section>
+
+<section id="references" class="page-section references">
+  <h2>Sources</h2>
+  <p class="note">Sources marked <b>(WP)</b> are Wikipedia, used as secondary sources where no better source was found. "Read Oct 2026" marks pages whose content may change.</p>
+
+  <h3>Transistor physics and fabrication</h3>
+  <ol>
+    <li id="ref-R1"><b>R1</b><span>HyperPhysics (Georgia State University). <i>Doping.</i> <a href="https://hyperphysics.gsu.edu/hbase/Solids/dope.html">hyperphysics.gsu.edu</a></span></li>
+    <li id="ref-R2"><b>R2</b><span>Ye, Ernst &amp; Khare (2019). <i>The Nanosheet Transistor Is the Next (and Maybe Last) Step in Moore's Law.</i> IEEE Spectrum, 30 Jul 2019. <a href="https://spectrum.ieee.org/the-nanosheet-transistor-is-the-next-and-maybe-last-step-in-moores-law">spectrum.ieee.org</a></span></li>
+    <li id="ref-R3"><b>R3</b><span>Intel (2011). <i>Intel Reinvents Transistors Using New 3-D Structure.</i> 4 May 2011. <a href="https://www.intc.com/news-events/press-releases/detail/655/intel-reinvents-transistors-using-new-3-d-structure">intc.com</a></span></li>
+    <li id="ref-R4"><b>R4</b><span>Moore, S. K. (2024). <i>TSMC Lifts the Curtain on Nanosheet Transistors.</i> IEEE Spectrum, 12 Dec 2024. <a href="https://spectrum.ieee.org/tsmc-n2">spectrum.ieee.org</a></span></li>
+    <li id="ref-R5"><b>R5</b><span>TSMC. <i>2nm Technology</i> (read Oct 2026). <a href="https://www.tsmc.com/english/dedicatedFoundry/technology/logic/l_2nm">tsmc.com</a></span></li>
+    <li id="ref-R6"><b>R6</b><span>Intel Foundry. <i>Intel 18A</i> (read Oct 2026). <a href="https://www.intel.com/content/www/us/en/foundry/process/18a.html">intel.com</a></span></li>
+    <li id="ref-R7"><b>R7</b><span>ASML. <i>6 crucial steps in semiconductor manufacturing</i> (updated 4 Oct 2023). <a href="https://www.asml.com/en/company/stories/2021/semiconductor-manufacturing-process-steps">asml.com</a></span></li>
+    <li id="ref-R8"><b>R8</b><span>Computer History Museum. <i>1955: Photolithography Techniques Are Used to Make Silicon Devices.</i> <a href="https://www.computerhistory.org/siliconengine/photolithography-techniques-are-used-to-make-silicon-devices/">computerhistory.org</a></span></li>
+    <li id="ref-R9"><b>R9</b><span>ASML. <i>Light and lasers.</i> <a href="https://www.asml.com/en/technology/lithography-principles/light-and-lasers">asml.com</a></span></li>
+    <li id="ref-R10"><b>R10</b><span>ASML. <i>EUV lithography systems</i> (read Oct 2026). <a href="https://www.asml.com/en/products/euv-lithography-systems">asml.com</a></span></li>
+    <li id="ref-R11"><b>R11</b><span>TrendForce (2026). <i>imec Secures ASML's Most Advanced EXE:5200 High-NA EUV…</i> 19 Mar 2026 (cites Reuters for the unit count and price estimate). <a href="https://www.trendforce.com/news/2026/03/19/news-imec-secures-asmls-most-advanced-exe5200-high-na-euv-for-sub-2nm-4q26-qualification-target/">trendforce.com</a></span></li>
+    <li id="ref-R12"><b>R12</b><span>imec (2026). <i>Imec receives the world's most advanced High NA EUV system.</i> 18 Mar 2026. <a href="https://www.imec-int.com/en/press/imec-receives-worlds-most-advanced-high-na-euv-system">imec-int.com</a></span></li>
+    <li id="ref-R13"><b>R13</b><span>Courtland, R. (2013). <i>The Status of Moore's Law: It's Complicated.</i> IEEE Spectrum, 28 Oct 2013. <a href="https://spectrum.ieee.org/the-status-of-moores-law-its-complicated">spectrum.ieee.org</a></span></li>
+    <li id="ref-R14"><b>R14</b><span>Moore, S. K. (2020). <i>A Better Way to Measure Progress in Semiconductors.</i> IEEE Spectrum, 21 Jul 2020. <a href="https://spectrum.ieee.org/a-better-way-to-measure-progress-in-semiconductors">spectrum.ieee.org</a></span></li>
+    <li id="ref-R15"><b>R15</b><span>Intel (2026). <i>Intel Foundry Details Process Milestones, Future Innovation at VLSI Symposium.</i> 16 Jun 2026. <a href="https://www.intel.com/content/www/us/en/newsroom/news/corporate/intel-foundry-details-process-milestones-future-innovation-at-vlsi-symposium.html">intel.com</a></span></li>
+  </ol>
+
+  <h3>Logic gates and circuits</h3>
+  <ol>
+    <li id="ref-R16"><b>R16</b><span>UP Microelectronics Lab. <i>CoE 197U: CMOS Gates.</i> <a href="https://classes.up-microlab.org/index.php/CoE_197U_CMOS_Gates">classes.up-microlab.org</a></span></li>
+    <li id="ref-R17"><b>R17</b><span>Univ. Hamburg TAMS (Hades). <i>CMOS NAND2 gate.</i> <a href="https://tams.informatik.uni-hamburg.de/applets/hades/webdemos/05-switched/40-cmos/nand_print.html">tams.informatik.uni-hamburg.de</a></span></li>
+    <li id="ref-R18"><b>R18</b><span>Univ. Hamburg TAMS (Hades). <i>CMOS NOR2 gate.</i> <a href="https://tams.informatik.uni-hamburg.de/applets/hades/webdemos/05-switched/40-cmos/nor_print.html">tams.informatik.uni-hamburg.de</a></span></li>
+    <li id="ref-R19"><b>R19</b><span>Univ. Hamburg TAMS (Hades). <i>AND gate (andbig).</i> <a href="https://tams.informatik.uni-hamburg.de/applets/hades/webdemos/10-gates/00-gates/andbig.html">tams.informatik.uni-hamburg.de</a></span></li>
+    <li id="ref-R20"><b>R20</b><span>MIT OCW. <i>6.004 Computation Structures</i> (Spring 2017), lecture transcript. <a href="https://ocw.mit.edu/courses/6-004-computation-structures-spring-2017/55f9426585ab51d1bbc4369d183b72a1_zZfr7Zqfqm4.vtt">ocw.mit.edu</a></span></li>
+    <li id="ref-R21"><b>R21</b><span>(WP) <i>XOR gate.</i> <a href="https://en.wikipedia.org/wiki/XOR_gate">en.wikipedia.org</a></span></li>
+    <li id="ref-R22"><b>R22</b><span>Univ. Hamburg TAMS (Hades). <i>CMOS XOR with transmission gate.</i> <a href="https://tams.informatik.uni-hamburg.de/applets/hades/webdemos/05-switched/40-cmos/xor-tgate.html">tams.informatik.uni-hamburg.de</a></span></li>
+    <li id="ref-R23"><b>R23</b><span>(WP) <i>Static random-access memory.</i> <a href="https://en.wikipedia.org/wiki/Static_random-access_memory">en.wikipedia.org</a></span></li>
+    <li id="ref-R24"><b>R24</b><span>Texas Instruments. <i>SN74HC00: Quadruple 2-Input NAND Gates.</i> <a href="https://www.ti.com/product/SN74HC00">ti.com</a></span></li>
+    <li id="ref-R25"><b>R25</b><span>(WP) <i>Logic gate.</i> <a href="https://en.wikipedia.org/wiki/Logic_gate">en.wikipedia.org</a></span></li>
+    <li id="ref-R26"><b>R26</b><span>Internet Encyclopedia of Philosophy. <i>The Sheffer Stroke.</i> <a href="https://iep.utm.edu/sheffers/">iep.utm.edu</a></span></li>
+    <li id="ref-R27"><b>R27</b><span>(WP) <i>Sheffer stroke.</i> <a href="https://en.wikipedia.org/wiki/Sheffer_stroke">en.wikipedia.org</a></span></li>
+    <li id="ref-R28"><b>R28</b><span>(WP) <i>Adder (electronics).</i> <a href="https://en.wikipedia.org/wiki/Adder_(electronics)">en.wikipedia.org</a></span></li>
+    <li id="ref-R29"><b>R29</b><span>(WP) <i>Flip-flop (electronics).</i> <a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)">en.wikipedia.org</a></span></li>
+    <li id="ref-R30"><b>R30</b><span>Shannon, C. E. (1948). <i>A Mathematical Theory of Communication.</i> Bell System Technical Journal 27. <a href="https://people.math.harvard.edu/~ctm/home/text/others/shannon/entropy/entropy.pdf">people.math.harvard.edu (PDF)</a></span></li>
+    <li id="ref-R31"><b>R31</b><span>(WP) <i>Dynamic random-access memory.</i> <a href="https://en.wikipedia.org/wiki/Dynamic_random-access_memory">en.wikipedia.org</a></span></li>
+  </ol>
+
+  <h3>Bits, bytes, encoding and display</h3>
+  <ol>
+    <li id="ref-R32"><b>R32</b><span>Buchholz, W. (1977). <i>Origin of the word "byte".</i> BYTE, Feb 1977, p.144 (Computer History Museum archive). <a href="https://archive.computerhistory.org/resources/access/text/2016/12/102762489-05-01-acc.pdf">archive.computerhistory.org (PDF)</a></span></li>
+    <li id="ref-R33"><b>R33</b><span>(WP) <i>Byte.</i> <a href="https://en.wikipedia.org/wiki/Byte">en.wikipedia.org</a></span></li>
+    <li id="ref-R34"><b>R34</b><span>(WP) <i>Binary number.</i> <a href="https://en.wikipedia.org/wiki/Binary_number">en.wikipedia.org</a></span></li>
+    <li id="ref-R35"><b>R35</b><span>(WP) <i>Hexadecimal.</i> <a href="https://en.wikipedia.org/wiki/Hexadecimal">en.wikipedia.org</a></span></li>
+    <li id="ref-R36"><b>R36</b><span>QMK Firmware. <i>How a Keyboard Matrix Works.</i> <a href="https://docs.qmk.fm/how_a_matrix_works">docs.qmk.fm</a></span></li>
+    <li id="ref-R37"><b>R37</b><span>QMK Firmware. <i>How Keyboards Work.</i> <a href="https://docs.qmk.fm/how_keyboards_work">docs.qmk.fm</a></span></li>
+    <li id="ref-R38"><b>R38</b><span>USB-IF. <i>Device Class Definition for HID, v1.11</i> (Appendix B, boot keyboard report). <a href="https://www.usb.org/sites/default/files/hid1_11.pdf">usb.org (PDF)</a></span></li>
+    <li id="ref-R39"><b>R39</b><span>USB-IF. <i>HID Usage Tables v1.7</i> (27 Jan 2026), page 0x07: 0x04 = Keyboard A, 0xE1 = Left Shift. <a href="https://usb.org/sites/default/files/hut1_7.pdf">usb.org (PDF)</a></span></li>
+    <li id="ref-R40"><b>R40</b><span>Microsoft Learn. <i>Keyboard Input Overview.</i> <a href="https://learn.microsoft.com/en-us/windows/win32/inputdev/about-keyboard-input">learn.microsoft.com</a></span></li>
+    <li id="ref-R41"><b>R41</b><span>Unicode Consortium. <i>Unicode Character Database 18.0.0, UnicodeData.txt.</i> <a href="https://www.unicode.org/Public/UCD/latest/ucd/UnicodeData.txt">unicode.org</a></span></li>
+    <li id="ref-R42"><b>R42</b><span>IETF (2003). <i>RFC 3629: UTF-8, a transformation format of ISO 10646.</i> <a href="https://www.rfc-editor.org/rfc/rfc3629">rfc-editor.org</a></span></li>
+    <li id="ref-R43"><b>R43</b><span>Microsoft Learn. <i>OpenType spec: cmap table.</i> <a href="https://learn.microsoft.com/en-us/typography/opentype/spec/cmap">learn.microsoft.com</a></span></li>
+    <li id="ref-R44"><b>R44</b><span>Apple. <i>TrueType Reference Manual, Ch. 1: Digitizing Letterform Designs.</i> <a href="https://developer.apple.com/fonts/TrueType-Reference-Manual/RM01/Chap1.html">developer.apple.com</a></span></li>
+    <li id="ref-R45"><b>R45</b><span>FreeType. <i>API Reference: Glyph Retrieval (FT_Render_Mode).</i> <a href="https://freetype.org/freetype2/docs/reference/ft2-glyph_retrieval.html">freetype.org</a></span></li>
+    <li id="ref-R46"><b>R46</b><span>FreeType. <i>Glyph Conventions, section 6.</i> <a href="https://freetype.org/freetype2/docs/glyphs/glyphs-6.html">freetype.org</a></span></li>
+    <li id="ref-R47"><b>R47</b><span>(WP) <i>Framebuffer.</i> <a href="https://en.wikipedia.org/wiki/Framebuffer">en.wikipedia.org</a></span></li>
+    <li id="ref-R48"><b>R48</b><span>(WP) <i>Refresh rate.</i> <a href="https://en.wikipedia.org/wiki/Refresh_rate">en.wikipedia.org</a></span></li>
+    <li id="ref-R49"><b>R49</b><span>(WP) <i>Thin-film-transistor liquid-crystal display.</i> <a href="https://en.wikipedia.org/wiki/Thin-film-transistor_liquid-crystal_display">en.wikipedia.org</a></span></li>
+    <li id="ref-R50"><b>R50</b><span>(WP) <i>AMOLED.</i> <a href="https://en.wikipedia.org/wiki/AMOLED">en.wikipedia.org</a></span></li>
+    <li id="ref-R51"><b>R51</b><span>IEEE / ETHW. <i>Milestones: American Standard Code for Information Interchange (ASCII), 1963.</i> <a href="https://ethw.org/Milestones:American_Standard_Code_for_Information_Interchange_ASCII,_1963">ethw.org</a></span></li>
+    <li id="ref-R52"><b>R52</b><span>Unicode Consortium (2026). <i>Announcing the Unicode Standard, Version 18.0.</i> 16 Sep 2026. <a href="https://blog.unicode.org/2026/09/">blog.unicode.org</a></span></li>
+  </ol>
+
+  <h3>History and chips</h3>
+  <ol>
+    <li id="ref-R53"><b>R53</b><span>Computer History Museum. <i>Timeline of Computer History: Computers.</i> <a href="https://computerhistory.org/timeline/computers/">computerhistory.org</a></span></li>
+    <li id="ref-R54"><b>R54</b><span>Penn Almanac (2026). <i>Penn's ENIAC, the world's first electronic computer, turns 80.</i> 3 Mar 2026. <a href="https://almanac.upenn.edu/articles/penns-eniac-the-worlds-first-electronic-computer-turns-80">almanac.upenn.edu</a></span></li>
+    <li id="ref-R55"><b>R55</b><span>Computer History Museum. <i>1947: Invention of the Point-Contact Transistor.</i> <a href="https://www.computerhistory.org/siliconengine/invention-of-the-point-contact-transistor/">computerhistory.org</a></span></li>
+    <li id="ref-R56"><b>R56</b><span>Computer History Museum. <i>1958: All Semiconductor "Solid Circuit" is Demonstrated.</i> <a href="https://www.computerhistory.org/siliconengine/all-semiconductor-solid-circuit-is-demonstrated/">computerhistory.org</a></span></li>
+    <li id="ref-R57"><b>R57</b><span>Computer History Museum. <i>1959: Practical Monolithic Integrated Circuit Concept Patented.</i> <a href="https://www.computerhistory.org/siliconengine/practical-monolithic-integrated-circuit-concept-patented/">computerhistory.org</a></span></li>
+    <li id="ref-R58"><b>R58</b><span>Computer History Museum. <i>1960: Metal Oxide Semiconductor (MOS) Transistor Demonstrated.</i> <a href="https://www.computerhistory.org/siliconengine/metal-oxide-semiconductor-mos-transistor-demonstrated/">computerhistory.org</a></span></li>
+    <li id="ref-R59"><b>R59</b><span>Computer History Museum. <i>1965: "Moore's Law" Predicts the Future of Integrated Circuits.</i> <a href="https://www.computerhistory.org/siliconengine/moores-law-predicts-the-future-of-integrated-circuits/">computerhistory.org</a></span></li>
+    <li id="ref-R60"><b>R60</b><span>Computer History Museum. <i>1971: Microprocessor Integrates CPU Function onto a Single Chip.</i> <a href="https://www.computerhistory.org/siliconengine/microprocessor-integrates-cpu-function-onto-a-single-chip/">computerhistory.org</a></span></li>
+    <li id="ref-R61"><b>R61</b><span>Computer History Museum. <i>Intel "x86" Family and the Microprocessor Wars.</i> <a href="https://www.computerhistory.org/revolution/story/330">computerhistory.org</a> (note: CHM dates the 8086 to 1976, the start of design; it was released in 1978)</span></li>
+    <li id="ref-R62"><b>R62</b><span>CIO (2006). <i>Intel to launch Montecito server chip Tuesday.</i> 14 Jul 2006. <a href="https://www.cio.com/article/258671/servers-intel-to-launch-montecito-server-chip-tuesday.html">cio.com</a></span></li>
+    <li id="ref-R63"><b>R63</b><span>NVIDIA. <i>NVIDIA Blackwell Architecture</i> (read Oct 2026). <a href="https://www.nvidia.com/en-us/data-center/technologies/blackwell-architecture/">nvidia.com</a></span></li>
+    <li id="ref-R64"><b>R64</b><span>NVIDIA Developer Blog (2026). <i>Inside the NVIDIA Rubin Platform: Six New Chips, One AI Supercomputer.</i> 5 Jan 2026. <a href="https://developer.nvidia.com/blog/inside-the-nvidia-rubin-platform-six-new-chips-one-ai-supercomputer/">developer.nvidia.com</a></span></li>
+    <li id="ref-R65"><b>R65</b><span>Cerebras (2024). <i>Cerebras Announces Third Generation Wafer Scale Engine.</i> 13 Mar 2024. <a href="https://www.cerebras.ai/press-release/cerebras-announces-third-generation-wafer-scale-engine">cerebras.ai</a></span></li>
+    <li id="ref-R66"><b>R66</b><span>NVIDIA Developer Blog (2022). <i>NVIDIA Hopper Architecture In-Depth.</i> 22 Mar 2022. <a href="https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/">developer.nvidia.com</a></span></li>
+    <li id="ref-R95"><b>R95</b><span>Apple Newsroom (2026). <i>Apple introduces M6 and M5 Ultra…</i> 25 Aug 2026. <a href="https://www.apple.com/newsroom/2026/08/apple-introduces-m6-and-m5-ultra-for-a-big-leap-in-performance-and-ai-compute/">apple.com</a></span></li>
+    <li id="ref-R96"><b>R96</b><span>Computer History Museum. <i>1954: Silicon Transistors Offer Superior Operating Characteristics.</i> <a href="https://www.computerhistory.org/siliconengine/silicon-transistors-offer-superior-operating-characteristics/">computerhistory.org</a></span></li>
+  </ol>
+
+  <h3>Simpler devices</h3>
+  <ol>
+    <li id="ref-R67"><b>R67</b><span>Computer History Museum. <i>1974: General-Purpose Microcontroller Family is Announced.</i> <a href="https://www.computerhistory.org/siliconengine/general-purpose-microcontroller-family-is-announced/">computerhistory.org</a></span></li>
+    <li id="ref-R68"><b>R68</b><span>DigiKey (2011). <i>Application Ideas for 8-bit Low-Pin-Count Microcontrollers.</i> 8 Aug 2011. <a href="https://www.digikey.co.nz/en/articles/application-ideas-for-8-bit-low-pin-count-microcontrollers">digikey.co.nz</a></span></li>
+    <li id="ref-R69"><b>R69</b><span>UCSB Physics Lecture Demonstrations. <i>Bimetallic strip.</i> <a href="https://web.physics.ucsb.edu/~lecturedemonstrations/Composer/Pages/48.09.html">web.physics.ucsb.edu</a></span></li>
+    <li id="ref-R70"><b>R70</b><span>Venkat, S. (2021). <i>Automotive Functional Safety Compliance In EDA Tools And IP.</i> Semiconductor Engineering, 1 Feb 2021. <a href="https://semiengineering.com/author/swami-venkat/">semiengineering.com</a></span></li>
+    <li id="ref-R71"><b>R71</b><span>IIT (ISM) Dhanbad. <i>Electronics Class Notes: Analog and Digital Signals.</i> <a href="https://people.iitism.ac.in/~sarun/notes/nphc206/05_signals.html">people.iitism.ac.in</a></span></li>
+    <li id="ref-R72"><b>R72</b><span>Computer History Museum. <i>1962: Aerospace Systems Are the First Applications for ICs in Computers.</i> <a href="https://www.computerhistory.org/siliconengine/aerospace-systems-are-first-the-applications-for-ics-in-computers/">computerhistory.org</a></span></li>
+    <li id="ref-R73"><b>R73</b><span>Leibson, S. (2024). <i>The First ICs on the Moon: The Apollo Guidance Computer, Part 1.</i> EE Journal, 10 Jun 2024. <a href="https://www.eejournal.com/article/the-first-ics-on-the-moon-the-apollo-guidance-computer-part-1/">eejournal.com</a></span></li>
+  </ol>
+
+  <h3>Quantum computing</h3>
+  <ol>
+    <li id="ref-R74"><b>R74</b><span>IBM Think. <i>What is quantum computing?</i> (10 Jun 2025, updated 2 Apr 2026). <a href="https://www.ibm.com/think/topics/quantum-computing">ibm.com</a></span></li>
+    <li id="ref-R75"><b>R75</b><span>Aaronson, S. (2021). <i>What Makes Quantum Computing So Hard to Explain?</i> Quanta Magazine, 8 Jun 2021. <a href="https://www.quantamagazine.org/why-is-quantum-computing-so-hard-to-explain-20210608/">quantamagazine.org</a></span></li>
+    <li id="ref-R76"><b>R76</b><span>Y Combinator (2018). <i>Scott Aaronson on Computational Complexity Theory and Quantum Computers.</i> 29 Jun 2018. <a href="https://www.ycombinator.com/blog/scott-aaronson-on-computational-complexity-theory-and-quantum-computers">ycombinator.com</a></span></li>
+    <li id="ref-R77"><b>R77</b><span>Caltech Science Exchange. <i>What Is Quantum Entanglement?</i> <a href="https://scienceexchange.caltech.edu/topics/quantum-science-explained/entanglement">scienceexchange.caltech.edu</a></span></li>
+    <li id="ref-R78"><b>R78</b><span>Shalm, K. (2025). <i>Quantum and Dance: It Takes 2 to Entangle.</i> NIST Taking Measure, 14 Apr 2025. <a href="https://www.nist.gov/blogs/taking-measure/quantum-and-dance-it-takes-2-entangle">nist.gov</a></span></li>
+    <li id="ref-R79"><b>R79</b><span>Aaronson, S. <i>Shtetl-Optimized</i> (blog masthead, read 31 Oct 2026). <a href="https://scottaaronson.blog/">scottaaronson.blog</a></span></li>
+    <li id="ref-R81"><b>R81</b><span>(WP) <i>Grover's algorithm.</i> <a href="https://en.wikipedia.org/wiki/Grover%27s_algorithm">en.wikipedia.org</a></span></li>
+    <li id="ref-R82"><b>R82</b><span>Brubaker, B. (2024). <i>Quantum Computers Cross Critical Error Threshold.</i> Quanta Magazine, 9 Dec 2024. <a href="https://www.quantamagazine.org/quantum-computers-cross-critical-error-threshold-20241209/">quantamagazine.org</a></span></li>
+    <li id="ref-R83"><b>R83</b><span>Google (2024). <i>Meet Willow, our state-of-the-art quantum chip.</i> 9 Dec 2024. <a href="https://blog.google/technology/research/google-willow-quantum-chip/">blog.google</a></span></li>
+    <li id="ref-R84"><b>R84</b><span>Caltech (2025). <i>Caltech Team Sets Record with 6,100-Qubit Array.</i> 24 Sep 2025. <a href="https://thisis.caltech.edu/news/caltech-team-sets-record-with-6100-qubit-array">caltech.edu</a></span></li>
+    <li id="ref-R85"><b>R85</b><span>Google (2025). <i>Our Quantum Echoes algorithm…</i> 22 Oct 2025. <a href="https://blog.google/technology/research/quantum-echoes-willow-verifiable-quantum-advantage/">blog.google</a></span></li>
+    <li id="ref-R86"><b>R86</b><span>IBM Newsroom (2026). <i>IBM and The University of Chicago Demonstrate Quantum Advantage…</i> 30 Jul 2026. <a href="https://newsroom.ibm.com/2026-07-30-ibm-and-the-university-of-chicago-demonstrate-quantum-advantage,-establishing-trusted-quantum-computation-on-logical-circuits">newsroom.ibm.com</a></span></li>
+    <li id="ref-R87"><b>R87</b><span>Quantum Timeline. <i>IBM and partners claim quantum advantage with built-in accuracy checks</i> (covers the Aug 2026 classical reproduction). <a href="https://quantumtimeline.org/milestones/2026-ibm-trusted-quantum-advantage/">quantumtimeline.org</a></span></li>
+    <li id="ref-R88"><b>R88</b><span>IBM Quantum (2025). <i>IBM lays out clear path to fault-tolerant quantum computing.</i> 10 Jun 2025. <a href="https://www.ibm.com/quantum/blog/large-scale-ftqc">ibm.com</a></span></li>
+    <li id="ref-R89"><b>R89</b><span>Quantinuum (2026). <i>Quantinuum Breaks Error-Correction World Record by 10x…</i> 19 Oct 2026 (company press release). <a href="https://www.quantinuum.com/press-releases/quantinuum-breaks-error-correction-world-record-by-10x-validating-its-leading-path-to-fault-tolerant-quantum-computing-by-2029">quantinuum.com</a></span></li>
+    <li id="ref-R90"><b>R90</b><span>NIST (2024). <i>NIST Releases First 3 Finalized Post-Quantum Encryption Standards.</i> 13 Aug 2024. <a href="https://www.nist.gov/news-events/news/2024/08/nist-releases-first-3-finalized-post-quantum-encryption-standards">nist.gov</a></span></li>
+    <li id="ref-R91"><b>R91</b><span>Quantum Computing Report (2026). <i>NIST releases final IR 8547…</i> 27 Oct 2026 (summary of NIST IR 8547; <a href="https://csrc.nist.gov/pubs/ir/8547/final">primary document</a>). <a href="https://quantumcomputingreport.com/nist-releases-final-ir-8547-establishing-definitive-post-quantum-cryptography-transition-timeline-and-deprecation-schedules/">quantumcomputingreport.com</a></span></li>
+    <li id="ref-R92"><b>R92</b><span>Gidney, C. (2025). <i>How to factor 2048 bit RSA integers with less than a million noisy qubits.</i> arXiv:2505.15917, 21 May 2025. <a href="https://arxiv.org/abs/2505.15917">arxiv.org</a></span></li>
+    <li id="ref-R93"><b>R93</b><span>Rioux, F. <i>Single-photon Interference: Third Version.</i> Chemistry LibreTexts. <a href="https://chem.libretexts.org/Bookshelves/Physical_and_Theoretical_Chemistry_Textbook_Maps/Quantum_Tutorials_(Rioux)/07:_Quantum_Optics/7.03:_Single-photon_Interference_-_Third_Version">chem.libretexts.org</a></span></li>
+    <li id="ref-R94"><b>R94</b><span>Quantum Computing Report (2025). <i>Harvard and collaborators demonstrate scalable fault-tolerant architecture with 448 neutral atom qubits.</i> 23 Nov 2025. <a href="https://quantumcomputingreport.com/harvard-and-collaborators-demonstrate-scalable-fault-tolerant-architecture-with-448-neutral-atom-qubits/">quantumcomputingreport.com</a></span></li>
+  </ol>
+</section>
+
+<p class="back-link"><a href="/brain-vs-computer/#model">← Back to the model</a></p>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Part of <a href="/">learn.nandalogic.com</a> · <a href="/brain-vs-computer/">From Matter to Thought</a>. No tracking, no cookies. Self-check progress stays in this browser.</p>
+  </div>
+</footer>
+</body>
+</html>

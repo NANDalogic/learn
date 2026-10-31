@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>learn.nandalogic.com</title>
+<meta name="description" content="Interactive, sourced explainers from NANDalogic.">
+<meta name="color-scheme" content="light dark">
+<script>try{var t=JSON.parse(localStorage.getItem("theme"));if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
+<link rel="stylesheet" href="/assets/site.css">
+<script src="/assets/site.js" defer></script>
+<style>
+  .topic { display: block; text-decoration: none; margin: 1rem 0; padding: 1rem 1.1rem; background: var(--surface); border: 1px solid var(--line); border-top: 4px solid; border-image: linear-gradient(90deg, var(--brain), var(--computer)) 1; }
+  .topic h2 { margin: 0 0 .3rem; font-size: 1.3rem; }
+  .topic p { margin: 0 0 .5rem; color: var(--ink-2); }
+  .subtopic { display: flex; gap: .5rem; align-items: center; min-height: var(--tap); margin-left: 1rem; padding: .4rem .9rem; text-decoration: none; border: 1px solid var(--line); border-left: 4px solid var(--computer); border-radius: 10px; background: var(--surface); }
+  .subtopic span { color: var(--ink-2); font-size: .9rem; }
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="bar">
+    <a class="home" href="/">learn</a>
+    <span style="flex:1"></span>
+    <button type="button" class="icon theme-toggle" aria-label="Toggle dark mode">☾</button>
+  </div>
+</header>
+<main id="main" class="wrap">
+  <section class="page-section">
+    <p class="eyebrow">learn.nandalogic.com</p>
+    <h1>Learn</h1>
+    <p class="lede">Interactive explainers, built to be read on a phone. Every number links to its source.</p>
+
+    <a class="topic" href="/brain-vs-computer/">
+      <h2>From Matter to Thought: Brain vs. Computer</h2>
+      <p>How a brain and a computer go from physical stuff to a "thought", rung by rung, and how good the comparison really is.</p>
+      <span class="small"><b>8 interactive demos</b> · ladder, logic gates, neurons, synapses, memory, mapping</span>
+    </a>
+    <a class="subtopic" href="/brain-vs-computer/transistors/"><b>Deep-dive:</b> <span>Inside the Switch: transistors, logic, bits and quantum</span></a>
+  </section>
+</main>
+<footer class="site-footer">
+  <div class="wrap"><p>By <a href="https://nandalogic.com">NANDalogic</a>. No tracking, no cookies.</p></div>
+</footer>
+</body>
+</html>

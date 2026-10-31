@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="/assets/site.css">
 <link rel="stylesheet" href="page.css">
 <script src="/assets/site.js" defer></script>
+<script src="/assets/widgets.js" defer></script>
 <script src="page.js" defer></script>
 </head>
 <body>
@@ -60,6 +61,31 @@
     <div class="side is-computer">
       <span class="tag">Computer</span>
       <h3>The transistor</h3>
+      <p class="tldr">A tiny on/off switch. Wire a few together and you get a rule (a gate); wire billions and you get a chip.</p>
+      <figure class="fig">
+        <svg viewBox="0 0 320 112" role="img" aria-label="One transistor is a switch; a few make a gate; 80 billion make a chip">
+          <rect x="22" y="24" width="52" height="34" rx="6" class="fl-comp-soft" stroke-width="2"/>
+          <text x="48" y="45" text-anchor="middle" class="lbl-b">on/off</text>
+          <text x="48" y="80" text-anchor="middle">1 transistor</text>
+          <text x="48" y="94" text-anchor="middle" class="lbl-muted">a switch</text>
+          <path d="M88 41 h22 m-6 -5 l6 5 l-6 5" class="st-muted" stroke-width="2"/>
+          <path d="M128 41 h16 M128 33 h16 M128 49 h16" class="st-muted" stroke-width="1.5"/>
+          <path d="M144 22 h22 a19 19 0 0 1 0 38 h-22 Z" class="fl-comp-soft" stroke-width="2"/>
+          <text x="160" y="45" text-anchor="middle" class="lbl-b">AND</text>
+          <text x="160" y="80" text-anchor="middle">a few</text>
+          <text x="160" y="94" text-anchor="middle" class="lbl-muted">a gate (a rule)</text>
+          <path d="M200 41 h22 m-6 -5 l6 5 l-6 5" class="st-muted" stroke-width="2"/>
+          <rect x="238" y="14" width="56" height="54" rx="4" class="fl-comp-soft" stroke-width="2"/>
+          <path d="M250 14 v54 M262 14 v54 M274 14 v54 M286 14 v54 M238 27 h56 M238 41 h56 M238 55 h56" class="st-comp" stroke-width=".8"/>
+          <text x="266" y="80" text-anchor="middle">80 billion</text>
+          <text x="266" y="94" text-anchor="middle" class="lbl-muted">a chip (H100)</text>
+        </svg>
+      </figure>
+      <div class="stats">
+        <div class="stat"><b>80 billion</b><span>transistors in an H100 [R4][R11]</span></div>
+        <div class="stat"><b>1.755 GHz</b><span>clock: billions of lockstep steps/sec [R14]</span></div>
+      </div>
+      <details class="more"><summary>Read the details</summary><div class="more-body">
       <ul>
         <li><b>Basic unit: the transistor.</b> A tiny switch controlled by electricity: on or off. A modern AI chip (Nvidia H100) contains <b>80 billion</b> transistors.[R4][R11]</li>
         <li><b>Electricity:</b> electrons move through metal wires. High voltage = <span class="bit is-1">1</span>, low voltage = <span class="bit is-0">0</span> (a "bit").</li>
@@ -73,10 +99,31 @@
         <li><b>Clock:</b> the whole chip runs in lockstep to a central clock, taking billions of steps per second. NVIDIA lists the PCIe version of the H100 at up to <b>1.755 GHz</b> (1,755 million steps per second).[R14]</li>
         <li><b>AI on top:</b> an artificial neural network is <i>software</i> that imitates simplified neurons. Each "neuron" multiplies its inputs by learned numbers called <b>weights</b>, adds them up, and passes the result on. So AI is brain-inspired math running on logic gates.</li>
       </ul>
+      </div></details>
     </div>
     <div class="side is-brain">
       <span class="tag">Brain</span>
       <h3>The neuron</h3>
+      <p class="tldr">A living cell that collects thousands of inputs and decides whether to fire. Far more than a switch.</p>
+      <figure class="fig">
+        <svg viewBox="0 0 320 120" role="img" aria-label="A neuron: branching dendrites take inputs into the cell body; the axon carries the output to terminals">
+          <path d="M84 60 L44 28 L22 16 M44 28 L32 44 M84 60 L34 60 L12 54 M34 60 L18 74 M84 60 L46 92 L24 106 M46 92 L30 86" class="st-brain" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="84" cy="60" r="17" class="fl-brain-soft" stroke-width="2.5"/>
+          <path d="M101 60 H252" class="st-brain" stroke-width="5" stroke-linecap="round"/>
+          <path d="M252 60 L284 34 M252 60 L292 60 M252 60 L284 86" class="st-brain" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="284" cy="34" r="5" class="fl-brain"/><circle cx="292" cy="60" r="5" class="fl-brain"/><circle cx="284" cy="86" r="5" class="fl-brain"/>
+          <text x="4" y="118" class="lbl-b">dendrites</text><text x="62" y="118" class="lbl-muted">inputs in</text>
+          <text x="84" y="32" text-anchor="middle" class="lbl-b">cell body</text>
+          <text x="176" y="50" text-anchor="middle" class="lbl-b">axon</text><text x="176" y="78" text-anchor="middle" class="lbl-muted">output cable →</text>
+          <text x="316" y="112" text-anchor="end" class="lbl-b">terminals</text>
+        </svg>
+      </figure>
+      <div class="stats">
+        <div class="stat"><b>86 billion</b><span>neurons [R1]</span></div>
+        <div class="stat"><b>10¹⁴–10¹⁵</b><span>synapses (connections) [R2]</span></div>
+        <div class="stat"><b>5–8 layers</b><span>of AI network to mimic one neuron [R3]</span></div>
+      </div>
+      <details class="more"><summary>Read the details</summary><div class="more-body">
       <ul>
         <li><b>Basic unit: the neuron</b>, a living cell. The adult human brain has about <b>86 billion neurons</b> (86.1 ± 8.1 billion), plus a similar number of non-neuronal support cells (about 84.6 billion).[R1]</li>
         <li><b>Parts of a neuron:</b>
@@ -89,6 +136,7 @@
         <li><b>Connections:</b> roughly <b>10¹⁴–10¹⁵ synapses</b> (100 trillion to 1 quadrillion).[R2]</li>
         <li><b>A neuron is not a logic gate.</b> It combines thousands of inputs in complex ways. A 2021 study found that mimicking one realistic cortical neuron took an artificial deep network <b>5–8 layers</b> deep.[R3]</li>
       </ul>
+      </div></details>
     </div>
   </div>
 
@@ -119,6 +167,24 @@
   <h2>Signals: electrical vs. chemical</h2>
 
   <h3>Inside a neuron: electrical</h3>
+  <p class="tldr is-brain">Charged atoms push the voltage up or down. Cross the threshold and the neuron fires a full spike; otherwise nothing.</p>
+  <figure class="fig is-brain">
+    <svg viewBox="0 0 320 132" role="img" aria-label="Voltage trace: small nudges below threshold do nothing; crossing about minus 55 millivolts fires a full spike">
+      <line x1="8" x2="312" y1="96" y2="96" class="st-muted st-dash" stroke-width="1"/>
+      <line x1="8" x2="312" y1="72" y2="72" class="st-brain st-dash" stroke-width="1.5"/>
+      <polyline points="8,96 56,96 66,88 76,96 104,96 114,84 126,96 146,96 156,80 163,72 168,12 177,110 190,102 212,96 312,96" class="st-brain" stroke-width="2.5" stroke-linejoin="round"/>
+      <text x="312" y="92" text-anchor="end" class="lbl-muted">rest ≈ −70 mV</text>
+      <text x="312" y="68" text-anchor="end">threshold ≈ −55 mV</text>
+      <text x="176" y="16" class="lbl-b">spike: all-or-nothing</text>
+      <text x="58" y="122" class="lbl-muted">small nudges: no spike</text>
+    </svg>
+    <figcaption>Textbook values. Information is in <i>when</i> and <i>how often</i> spikes happen.</figcaption>
+  </figure>
+  <div class="stats is-brain">
+    <div class="stat"><b>1–100 m/s</b><span>spike speed along the axon</span></div>
+    <div class="stat"><b>few hundred/s</b><span>maximum firing rate</span></div>
+  </div>
+  <details class="more"><summary>Read the details</summary><div class="more-body">
   <ul>
     <li>The "electricity" isn't electrons in a wire. It's <b>charged atoms (ions)</b>, mainly sodium and potassium, flowing through tiny protein gates in the cell wall called <b>ion channels</b>.</li>
     <li>A resting neuron sits at about <b>−70 millivolts</b> (textbook value).</li>
@@ -126,8 +192,17 @@
     <li>A spike is <b>all-or-nothing</b>: it either fires fully or not at all. Information is carried in <i>when</i> and <i>how often</i> spikes happen.</li>
     <li>Spikes travel down the axon at about <b>1–100 meters per second</b>, and a neuron fires at most a few hundred times per second (textbook values).</li>
   </ul>
+  </div></details>
 
   <h3>Between neurons: mostly chemical</h3>
+  <ol class="strip is-brain">
+    <li><b>Spike arrives</b>at the axon terminal</li>
+    <li><b>Chemicals released</b>neurotransmitters</li>
+    <li><b>Cross the gap</b>and bind to receptors</li>
+    <li><b>Voltage nudged</b>glutamate ↑ toward firing, GABA ↓ away</li>
+  </ol>
+  <p class="tldr is-brain">The chemical step is slower but adjustable. That adjustable strength is where learning and memory live.</p>
+  <details class="more"><summary>Read the details</summary><div class="more-body">
   <ul>
     <li>The <b>synapse</b> is the tiny gap between one neuron's axon terminal and the next neuron's dendrite.</li>
     <li>Step by step:
@@ -145,6 +220,7 @@
     <li><b>Electrical synapses</b> (gap junctions) also exist. They're direct, fast, and less flexible, and they're the minority.</li>
     <li><b>Broadcast chemicals</b> (neuromodulators like dopamine and serotonin) wash over whole regions and change how those regions behave, like a global settings change. Hormones act even more slowly, through the blood.</li>
   </ul>
+  </div></details>
 
   <!-- M4 -->
   <div class="module is-brain" id="m4" aria-labelledby="m4-title">
@@ -157,7 +233,14 @@
     </div>
   </div>
 
-  <h3>Speed comparison</h3>
+  <h3>Speed, scale and power</h3>
+  <div class="stats">
+    <div class="stat is-computer"><b>&gt; 1 million×</b><span>faster signals in board wiring than the fastest nerve [R12]</span></div>
+    <div class="stat is-brain"><b>86 billion</b><span>neurons, no clock, possibly &lt;1% strongly active at once [R1][R13]</span></div>
+    <div class="stat is-computer"><b>16,896</b><span>cores on an H100, all in lockstep [R11]</span></div>
+    <div class="stat"><b>20 W vs 700 W</b><span>a brain vs. one H100 [R4][R11]</span></div>
+  </div>
+  <details class="more"><summary>Read the details</summary><div class="more-body">
   <ul>
     <li>Electrical signals in circuit-board wiring travel at about <b>half the speed of light</b>, about <b>15 cm (6 inches) per nanosecond</b>.[R12] That's more than a million times faster than the fastest nerve signal (~100 m/s).
       <ul><li>What travels that fast is the electrical <i>wave</i>, not the electrons themselves.[R12]</li></ul></li>
@@ -167,6 +250,7 @@
     <li>An H100 has <b>16,896</b> processing cores (CUDA cores), all marching to one clock.[R11]</li>
     <li><b>Power:</b> the brain runs on about <b>20 watts</b> (textbook value). One H100 is rated at <b>700 watts</b>.[R4][R11]</li>
   </ul>
+  </div></details>
 
   <!-- M5 -->
   <div class="module" id="m5" aria-labelledby="m5-title">
@@ -307,7 +391,23 @@
   <p class="eyebrow">Part 6</p>
   <h2>Mapping the brain</h2>
   <p>A <b>connectome</b> is a complete wiring diagram: every neuron, every branch, every synapse.</p>
-  <h3>How it's made: the H01 project (Harvard + Google)[R5]</h3>
+  <h3>How it's made: the H01 project (Harvard + Google)</h3>
+  <ol class="strip is-brain">
+    <li><b>Tissue</b>removed in epilepsy surgery, preserved, stained</li>
+    <li><b>Slice</b>~5,300 slices, each 30 nm thick</li>
+    <li><b>Image</b>4 nm electron microscope, ~225 million images</li>
+    <li><b>Trace</b>AI follows every cell in 3D, finds synapses</li>
+    <li><b>Proofread</b>people fix the errors</li>
+  </ol>
+  <p class="small muted">Steps from Google Research's H01 write-up.[R5]</p>
+  <div class="stats is-brain">
+    <div class="stat"><b>57,000</b><span>cells in 1 mm³ [R6]</span></div>
+    <div class="stat"><b>150 million</b><span>synapses [R6]</span></div>
+    <div class="stat"><b>1.4 PB</b><span>of images [R5]</span></div>
+    <div class="stat"><b>1 millionth</b><span>of a human brain's volume [R5]</span></div>
+  </div>
+  <details class="more"><summary>Read the details</summary><div class="more-body">
+  <p>How it's made (H01, Harvard + Google):[R5]</p>
   <ol>
     <li>A small piece of human brain tissue, removed during epilepsy surgery, is preserved and stained.</li>
     <li>It's cut into about <b>5,300 slices</b>, each <b>30 nanometers</b> thick.</li>
@@ -316,6 +416,8 @@
     <li>People proofread the errors.</li>
   </ol>
   <p><b>Result:</b> about <b>57,000 cells</b> and <b>150 million synapses</b> in one cubic millimeter,[R6] stored as <b>1.4 petabytes</b> of images. That's about <b>one-millionth</b> of a human brain's volume.[R5]</p>
+
+  </div></details>
 
   <!-- M7 -->
   <div class="module is-brain" id="m7" aria-labelledby="m7-title">

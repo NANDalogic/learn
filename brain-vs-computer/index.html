@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>From Matter to Thought: Brain vs. Computer · learn.nandalogic.com</title>
+<meta name="description" content="Layer by layer: how a brain and a computer go from physical matter to a thought, and where the analogy holds and breaks.">
+<meta name="color-scheme" content="light dark">
+<script>try{var t=JSON.parse(localStorage.getItem("theme"));if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="page.css">
+<script src="/assets/site.js" defer></script>
+<script src="page.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="bar">
+    <a class="home" href="/">learn</a>
+    <nav class="section-nav" aria-label="Sections">
+      <ol>
+        <li><a href="#intro">Intro</a></li>
+        <li><a href="#blocks">Building blocks</a></li>
+        <li><a href="#signals">Signals</a></li>
+        <li><a href="#memory">Memory</a></li>
+        <li><a href="#thought">Thought</a></li>
+        <li><a href="#model">The model</a></li>
+        <li><a href="#mapping">Mapping</a></li>
+        <li><a href="#check">Self-check</a></li>
+        <li><a href="#references">Sources</a></li>
+      </ol>
+    </nav>
+    <button type="button" class="icon theme-toggle" aria-label="Toggle dark mode">☾</button>
+  </div>
+  <div class="progress" aria-hidden="true"><span></span></div>
+</header>
+
+<main id="main" class="wrap">
+
+<!-- ============ 1. INTRO ============ -->
+<section id="intro" class="page-section intro">
+  <p class="eyebrow">Brain vs. computer</p>
+  <h1>From Matter to Thought</h1>
+  <p class="lede">How does physical stuff become a thought, in a <span class="hl is-brain">brain</span> and in a <span class="hl is-computer">computer</span>?</p>
+  <p>This page climbs the ladder one rung at a time: the smallest switches, the signals, memory, and finally what a "thought" might be. At each rung it compares the two, and says how good the comparison really is.</p>
+  <div class="split intro-key">
+    <div class="side is-brain"><span class="tag">Brain</span><p>Living cells, water, salts. About 86 billion neurons.[R1]</p></div>
+    <div class="side is-computer"><span class="tag">Computer / AI</span><p>Silicon and metal. An H100 AI chip holds 80 billion transistors.[R4][R11]</p></div>
+  </div>
+  <p class="small muted">Small grey tags like <a class="fn" href="#references" tabindex="-1" aria-hidden="true">R1</a> open the source. Boxes marked <b>What this leaves out</b> say where a demo simplifies.</p>
+</section>
+
+<!-- ============ 2. BUILDING BLOCKS ============ -->
+<section id="blocks" class="page-section">
+  <p class="eyebrow">Part 1</p>
+  <h2>Building blocks: transistor vs. neuron</h2>
+
+  <div class="split">
+    <div class="side is-computer">
+      <span class="tag">Computer</span>
+      <h3>The transistor</h3>
+      <ul>
+        <li><b>Basic unit: the transistor.</b> A tiny switch controlled by electricity: on or off. A modern AI chip (Nvidia H100) contains <b>80 billion</b> transistors.[R4][R11]</li>
+        <li><b>Electricity:</b> electrons move through metal wires. High voltage = <span class="bit is-1">1</span>, low voltage = <span class="bit is-0">0</span> (a "bit").</li>
+        <li><b>Logic gates:</b> a few transistors wired together make a rule:
+          <ul>
+            <li><b>AND</b>: output is on only if <i>both</i> inputs are on</li>
+            <li><b>OR</b>: output is on if <i>either</i> input is on</li>
+            <li><b>NOT</b>: output is the opposite of the input</li>
+          </ul>
+          Everything a computer does (math, video, AI) is built from huge numbers of these simple rules.</li>
+        <li><b>Clock:</b> the whole chip runs in lockstep to a central clock, taking billions of steps per second. NVIDIA lists the PCIe version of the H100 at up to <b>1.755 GHz</b> (1,755 million steps per second).[R14]</li>
+        <li><b>AI on top:</b> an artificial neural network is <i>software</i> that imitates simplified neurons. Each "neuron" multiplies its inputs by learned numbers called <b>weights</b>, adds them up, and passes the result on. So AI is brain-inspired math running on logic gates.</li>
+      </ul>
+    </div>
+    <div class="side is-brain">
+      <span class="tag">Brain</span>
+      <h3>The neuron</h3>
+      <ul>
+        <li><b>Basic unit: the neuron</b>, a living cell. The adult human brain has about <b>86 billion neurons</b> (86.1 ± 8.1 billion), plus a similar number of non-neuronal support cells (about 84.6 billion).[R1]</li>
+        <li><b>Parts of a neuron:</b>
+          <ul>
+            <li><b>Dendrites</b>: input branches that receive signals</li>
+            <li><b>Cell body (soma)</b>: where inputs are combined</li>
+            <li><b>Axon</b>: the output cable</li>
+            <li><b>Axon terminals</b>: the endpoints that pass the signal to the next neuron</li>
+          </ul></li>
+        <li><b>Connections:</b> roughly <b>10¹⁴–10¹⁵ synapses</b> (100 trillion to 1 quadrillion).[R2]</li>
+        <li><b>A neuron is not a logic gate.</b> It combines thousands of inputs in complex ways. A 2021 study found that mimicking one realistic cortical neuron took an artificial deep network <b>5–8 layers</b> deep.[R3]</li>
+      </ul>
+    </div>
+  </div>
+
+  <a class="go-deeper" href="/brain-vs-computer/transistors/"><b>Go deeper:</b> <span>how transistors work, how gates are wired, and NAND</span></a>
+
+  <!-- M2 -->
+  <div class="module is-computer" id="m2" aria-labelledby="m2-title">
+    <div class="module-head"><span class="module-id">M2</span><h3 id="m2-title">Logic gate playground</h3></div>
+    <p class="goal">See that "computing" bottoms out in simple on/off rules.</p>
+    <div class="module-body"><p class="noscript">This demo needs JavaScript.</p></div>
+  </div>
+
+  <!-- M3 -->
+  <div class="module" id="m3" aria-labelledby="m3-title">
+    <div class="module-head"><span class="module-id">M3</span><h3 id="m3-title">Neuron vs. artificial neuron, same inputs</h3></div>
+    <p class="goal">See what the two share (inputs × strength, a threshold) and where they differ.</p>
+    <div class="module-body"><p class="noscript">This demo needs JavaScript.</p></div>
+    <div class="callout leaves-out">
+      <span class="callout-title">What this leaves out</span>
+      Real neurons combine inputs far more richly, closer to a 5–8 layer network,[R3] and the timing of inputs matters. The millivolt nudge per input here is a toy scale; −70 mV rest and −55 mV threshold are textbook values that vary by neuron type.
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3. SIGNALS ============ -->
+<section id="signals" class="page-section">
+  <p class="eyebrow">Part 2</p>
+  <h2>Signals: electrical vs. chemical</h2>
+
+  <h3>Inside a neuron: electrical</h3>
+  <ul>
+    <li>The "electricity" isn't electrons in a wire. It's <b>charged atoms (ions)</b>, mainly sodium and potassium, flowing through tiny protein gates in the cell wall called <b>ion channels</b>.</li>
+    <li>A resting neuron sits at about <b>−70 millivolts</b> (textbook value).</li>
+    <li>Inputs push the voltage up or down. If it crosses a <b>threshold</b> (about <b>−55 mV</b>, textbook value), the neuron fires a <b>spike</b> (action potential).</li>
+    <li>A spike is <b>all-or-nothing</b>: it either fires fully or not at all. Information is carried in <i>when</i> and <i>how often</i> spikes happen.</li>
+    <li>Spikes travel down the axon at about <b>1–100 meters per second</b>, and a neuron fires at most a few hundred times per second (textbook values).</li>
+  </ul>
+
+  <h3>Between neurons: mostly chemical</h3>
+  <ul>
+    <li>The <b>synapse</b> is the tiny gap between one neuron's axon terminal and the next neuron's dendrite.</li>
+    <li>Step by step:
+      <ol>
+        <li>A spike arrives at the axon terminal.</li>
+        <li>The terminal releases chemical messengers called <b>neurotransmitters</b>.</li>
+        <li>They cross the gap and bind to <b>receptors</b> on the next neuron.</li>
+        <li>This opens ion channels and nudges the next neuron's voltage:
+          <ul>
+            <li><b>Excitatory</b> (e.g., glutamate) pushes it toward firing.</li>
+            <li><b>Inhibitory</b> (e.g., GABA) pushes it away from firing.</li>
+          </ul></li>
+      </ol></li>
+    <li>The chemical step is slower but <b>adjustable</b>. A synapse's strength can change, and <b>that adjustability is where learning and memory live.</b></li>
+    <li><b>Electrical synapses</b> (gap junctions) also exist. They're direct, fast, and less flexible, and they're the minority.</li>
+    <li><b>Broadcast chemicals</b> (neuromodulators like dopamine and serotonin) wash over whole regions and change how those regions behave, like a global settings change. Hormones act even more slowly, through the blood.</li>
+  </ul>
+
+  <!-- M4 -->
+  <div class="module is-brain" id="m4" aria-labelledby="m4-title">
+    <div class="module-head"><span class="module-id">M4</span><h3 id="m4-title">Synapse close-up</h3></div>
+    <p class="goal">Electrical inside, chemical between, and learning = changing synapse strength.</p>
+    <div class="module-body"><p class="noscript">This demo needs JavaScript.</p></div>
+    <div class="callout leaves-out">
+      <span class="callout-title">What this leaves out</span>
+      Sizes, timings and response heights are illustrative, not measured. The dopamine wash here simply turns the response up, as a stand-in for "changing how a region behaves". "Practice" makes the synapse stronger in fixed steps; real strengthening and weakening follow richer rules.
+    </div>
+  </div>
+
+  <h3>Speed comparison</h3>
+  <ul>
+    <li>Electrical signals in circuit-board wiring travel at about <b>half the speed of light</b>, about <b>15 cm (6 inches) per nanosecond</b>.[R12] That's more than a million times faster than the fastest nerve signal (~100 m/s).
+      <ul><li>What travels that fast is the electrical <i>wave</i>, not the electrons themselves.[R12]</li></ul></li>
+    <li>Chip switches flip billions of times per second; a neuron fires at most a few hundred times per second.</li>
+    <li>The brain makes up for its slowness with <b>massive parallelism</b>: billions of neurons, each working independently, with no central clock.
+      <ul><li><b>But not all at once:</b> firing is expensive, so only a small fraction of neurons is strongly active at any moment, possibly <b>fewer than 1%</b> in the cortex (an estimate).[R13]</li></ul></li>
+    <li>An H100 has <b>16,896</b> processing cores (CUDA cores), all marching to one clock.[R11]</li>
+    <li><b>Power:</b> the brain runs on about <b>20 watts</b> (textbook value). One H100 is rated at <b>700 watts</b>.[R4][R11]</li>
+  </ul>
+
+  <!-- M5 -->
+  <div class="module" id="m5" aria-labelledby="m5-title">
+    <div class="module-head"><span class="module-id">M5</span><h3 id="m5-title">Speed, scale and power</h3></div>
+    <p class="goal">A slow but massively parallel, efficient brain vs. a fast, serial-leaning, power-hungry chip.</p>
+    <div class="module-body"><p class="noscript">This demo needs JavaScript.</p></div>
+    <div class="callout leaves-out">
+      <span class="callout-title">What this leaves out</span>
+      Signals inside a chip's tiny wires are slowed by resistance, so the board-wiring speed is a best case. <span class="todo">TODO: needs source</span> for the on-chip slowdown, or drop that clause. The &lt;1% figure is an energy-based estimate,[R13] not a measurement. The dot grids are not to scale: each dot stands for a huge number of neurons or cores.
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4. MEMORY ============ -->
+<section id="memory" class="page-section">
+  <p class="eyebrow">Part 3</p>
+  <h2>Memory: where each one stores what it knows</h2>
+  <div class="split">
+    <div class="side is-computer">
+      <span class="tag">Computer / AI</span>
+      <ul>
+        <li><b>Computer:</b> memory is stored <i>separately</i> from the processor (in RAM or on disk) and fetched by address. Recall is exact: the same address returns the same bits.</li>
+        <li><b>AI models:</b> what a model "knows" is stored in its <b>weights</b>. Concepts are stored as overlapping patterns of numbers, so related ideas activate each other.</li>
+      </ul>
+    </div>
+    <div class="side is-brain">
+      <span class="tag">Brain</span>
+      <ul>
+        <li>Memory is stored in the <b>strengths of synapses</b>, in the same place where processing happens.</li>
+        <li><b>Learning</b> = strengthening or weakening synapses.</li>
+        <li><b>Recall</b> = reactivating a pattern of neurons. A partial cue (a smell, a shade of blue) can reactivate part of a stored pattern, and the network fills in the rest.</li>
+        <li>Memories are <b>rebuilt each time</b> they're recalled, not played back like a file. That's why they drift and why false memories happen.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout definition">
+    <span class="callout-title">Key contrast</span>
+    In a brain, the hardware <i>is</i> the software, and it rewires itself while running. In a computer, the hardware is fixed and the software changes. Most current AI models are also frozen after training; they don't keep learning from use.
+  </div>
+
+  <!-- M6 -->
+  <div class="module" id="m6" aria-labelledby="m6-title">
+    <div class="module-head"><span class="module-id">M6</span><h3 id="m6-title">Two kinds of memory</h3></div>
+    <p class="goal">Exact address lookup vs. reconstructive pattern completion.</p>
+    <div class="module-body"><p class="noscript">This demo needs JavaScript.</p></div>
+    <div class="callout leaves-out">
+      <span class="callout-title">What this leaves out</span>
+      The brain-style side is a toy model of the idea (a tiny Hopfield-style network), not a model of how real brain circuits store memories.
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5. THOUGHT ============ -->
+<section id="thought" class="page-section">
+  <p class="eyebrow">Part 4</p>
+  <h2>What is a "thought"?</h2>
+  <p>There is <b>no agreed scientific definition</b>. This page uses a working definition:</p>
+  <div class="callout definition">
+    <span class="callout-title">Working definition (not a settled one)</span>
+    <b>A thought is a temporary pattern of activity across many units that represents something (an object, idea, or plan) and can trigger the next pattern, an action, or a memory.</b>
+  </div>
+  <div class="split">
+    <div class="side is-brain"><span class="tag">Brain</span><p>Millions of neurons firing in a particular pattern.</p></div>
+    <div class="side is-computer"><span class="tag">AI</span><p>A pattern of numbers moving through the network, called an <b>activation vector</b>.</p></div>
+  </div>
+  <div class="callout unknown">
+    <span class="callout-title">What's unknown</span>
+    Both process information, but only brains are <i>known</i> to have experiences. Whether an AI's pattern is <i>felt</i> in any sense is an open question. This page doesn't take a side.
+  </div>
+</section>
+
+<!-- ============ 6. THE MODEL ============ -->
+<section id="model" class="page-section">
+  <p class="eyebrow">Part 5 · The centerpiece</p>
+  <h2>The model: from matter to thought</h2>
+  <p>Ten rungs, from atoms at the bottom to thought at the top. Tap a rung to compare the two sides and see how good the analogy is.</p>
+
+  <!-- M1 -->
+  <div class="module" id="m1" aria-labelledby="m1-title">
+    <div class="module-head"><span class="module-id">M1</span><h3 id="m1-title">The ladder</h3></div>
+    <p class="goal">Hold the whole model in mind at once, and know where the analogy holds and where it breaks.</p>
+    <div class="module-body"><p class="noscript">This demo needs JavaScript. The same content is in the table below.</p></div>
+    <p class="small muted badge-key">Analogy strength:
+      <span class="badge good">Good</span> <span class="badge moderate">Moderate</span> <span class="badge loose">Loose</span> <span class="badge weak">Weak</span></p>
+  </div>
+
+  <details class="ladder-table">
+    <summary>The ladder as a table</summary>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>#</th><th>Stage</th><th class="is-brain">Brain</th><th class="is-computer">Computer / AI</th><th>How good is the analogy?</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Matter</td><td>Living cells, water, salts</td><td>Silicon, metal</td><td>— (just different materials)</td></tr>
+          <tr><td>2</td><td>What carries charge</td><td>Ions (sodium, potassium) crossing cell walls</td><td>Electrons in wires</td><td>Moderate: both are moving charge, by very different mechanisms</td></tr>
+          <tr><td>3</td><td>Smallest switch</td><td>Ion channel (protein gate)</td><td>Transistor</td><td><b>Good</b>: both are gates that open or close based on voltage</td></tr>
+          <tr><td>4</td><td>Basic signal</td><td>Spike: all-or-nothing, meaning carried in timing and rate</td><td>Bit: 0 or 1</td><td>Loose: spikes carry information in <i>timing</i>; bits in fixed levels</td></tr>
+          <tr><td>5</td><td>Processing unit</td><td>Neuron, which combines thousands of inputs</td><td>Logic gate; in AI, a software "neuron" built from many gates</td><td><b>Weak</b>: one real neuron ≈ a 5–8 layer artificial network [R3]</td></tr>
+          <tr><td>6</td><td>Connection</td><td>Synapse: chemical, adjustable strength</td><td>Fixed wire on a chip; adjustable <i>weight</i> in AI</td><td><b>Good for AI weights</b>, poor for chip wires</td></tr>
+          <tr><td>7</td><td>Memory</td><td>Synapse strengths, in the same place as processing</td><td>Separate RAM/disk; <i>weights</i> in AI</td><td>Loose</td></tr>
+          <tr><td>8</td><td>Circuit</td><td>A group of neurons doing one job (e.g., detecting an edge)</td><td>Circuits like adders; in AI, layers that detect features</td><td>Loose</td></tr>
+          <tr><td>9</td><td>System</td><td>Brain regions working together</td><td>Chip + software → model</td><td>Loose</td></tr>
+          <tr><td>10</td><td>Thought</td><td>A pattern of firing across neurons</td><td>A pattern of numbers (activation vector)</td><td>Loose: same idea of "a pattern that represents something"; whether it's <i>experienced</i> is unknown</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <div class="callout myth">
+    <span class="callout-title">Common mistake</span>
+    <p>"A neuron is like a terminal" is <b>wrong</b>. In the brain, a <i>terminal</i> is just the end of an axon, the neuron's output point.</p>
+    <p>The closest pairings are:</p>
+    <ul>
+      <li><b>ion channel ↔ transistor</b></li>
+      <li><b>synapse ↔ AI weight</b></li>
+      <li><b>neuron ↔ a small processor, or a mini neural network of its own</b></li>
+    </ul>
+  </div>
+
+  <h3>Key differences at a glance</h3>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th></th><th class="is-brain">Brain</th><th class="is-computer">Computer / AI</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Signal speed</th><td>~1–100 m/s</td><td>~Half light speed in board wiring (~15 cm/ns) [R12]</td></tr>
+        <tr><th scope="row">Switching rate</th><td>Up to a few hundred spikes/sec per neuron</td><td>Billions of steps/sec (up to 1.755 GHz on an H100 PCIe) [R14]</td></tr>
+        <tr><th scope="row">Parallelism</th><td>~86 billion independent neurons [R1], but only a small fraction (possibly &lt;1%) strongly active at once [R13]</td><td>16,896 cores on an H100, in lockstep [R11]</td></tr>
+        <tr><th scope="row">Timing</th><td>No central clock</td><td>Central clock, lockstep</td></tr>
+        <tr><th scope="row">Power</th><td>~20 W</td><td>~700 W per H100 [R4][R11]</td></tr>
+        <tr><th scope="row">Memory location</th><td>Same place as processing (synapses)</td><td>Separate from processing</td></tr>
+        <tr><th scope="row">Learning</th><td>Rewires constantly</td><td>Most current AI is fixed after training</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 7. MAPPING ============ -->
+<section id="mapping" class="page-section">
+  <p class="eyebrow">Part 6</p>
+  <h2>Mapping the brain</h2>
+  <p>A <b>connectome</b> is a complete wiring diagram: every neuron, every branch, every synapse.</p>
+  <h3>How it's made: the H01 project (Harvard + Google)[R5]</h3>
+  <ol>
+    <li>A small piece of human brain tissue, removed during epilepsy surgery, is preserved and stained.</li>
+    <li>It's cut into about <b>5,300 slices</b>, each <b>30 nanometers</b> thick.</li>
+    <li>Each slice is imaged at <b>4-nanometer</b> resolution with an electron microscope, about <b>225 million images</b> in total.</li>
+    <li>AI traces every cell through the stack of slices in 3D, and finds the synapses.</li>
+    <li>People proofread the errors.</li>
+  </ol>
+  <p><b>Result:</b> about <b>57,000 cells</b> and <b>150 million synapses</b> in one cubic millimeter,[R6] stored as <b>1.4 petabytes</b> of images. That's about <b>one-millionth</b> of a human brain's volume.[R5]</p>
+
+  <!-- M7 -->
+  <div class="module is-brain" id="m7" aria-labelledby="m7-title">
+    <div class="module-head"><span class="module-id">M7</span><h3 id="m7-title">Slice-through</h3></div>
+    <p class="goal">Feel why mapping is hard (scale, data, proofreading) and why a map alone isn't a simulation.</p>
+    <div class="module-body"><p class="noscript">This demo needs JavaScript.</p></div>
+    <div class="callout leaves-out">
+      <span class="callout-title">What this leaves out</span>
+      The counters grow evenly with the slider; real imaging, tracing and proofreading don't progress this neatly. The cell shapes are invented for illustration, not H01 data.
+    </div>
+  </div>
+
+  <div class="callout status">
+    <span class="callout-title">Records so far (as of October 2026)</span>
+    <p>The complete central nervous system of a male fruit fly, brain plus nerve cord, with about <b>166,700 neurons</b>. It was published in <i>Cell</i> on 3 September 2026 by Janelia, Cambridge, the MRC Laboratory of Molecular Biology, and Google.[R10]</p>
+    <p>A whole mouse connectome is considered a <b>10–15 year goal</b>, and the most expensive step is still human proofreading.[R9]</p>
+  </div>
+  <div class="callout myth">
+    <span class="callout-title">Why a map isn't enough</span>
+    The worm <i>C. elegans</i> has 302 neurons, fully mapped in 1986,[R7] and still can't be fully simulated. A map shows <i>what connects to what</i>, not <i>how each connection behaves</i>, and a static map can't learn.[R8]
+  </div>
+</section>
+
+<!-- ============ 8. SELF-CHECK ============ -->
+<section id="check" class="page-section">
+  <p class="eyebrow">Part 7</p>
+  <h2>Self-check</h2>
+  <p>Two quick ways to lock it in. Your progress is saved on this device only.</p>
+
+  <!-- M8 -->
+  <div class="module" id="m8" aria-labelledby="m8-title">
+    <div class="module-head"><span class="module-id">M8</span><h3 id="m8-title">Match and quiz</h3></div>
+    <p class="goal">Retain the model: the right pairings, and why.</p>
+    <div class="module-body"><p class="noscript">This demo needs JavaScript.</p></div>
+  </div>
+</section>
+
+<!-- ============ SIMPLIFICATIONS + REFERENCES ============ -->
+<section id="simplifications" class="page-section">
+  <h2>What this page simplifies</h2>
+  <ol class="small">
+    <li><b>Neuron as a "summing unit"</b> is simplified. Real neurons compute much more (about a 5–8 layer network).[R3]</li>
+    <li><b>Synapse ↔ AI weight</b> is a <i>functional</i> analogy, not a physical one.</li>
+    <li><b>Ion channel ↔ transistor</b>: both are voltage-controlled gates, but by different mechanisms (proteins and ions vs. semiconductors and electrons).</li>
+    <li><b>"Thought" definition</b> is a working definition, not a settled scientific one.</li>
+    <li><b>Textbook values</b> (−70 mV rest, about −55 mV threshold, 1–100 m/s, a few hundred spikes/sec, about 20 W) are typical figures. Real values vary by neuron type.</li>
+    <li><b>Chip signal speed</b> (about half light speed) is for circuit-board wiring. It's the electrical wave that moves that fast, not the electrons.[R12]</li>
+    <li><b>Sparse firing (&lt;1%)</b> is an energy-budget estimate for the cortex, not a measurement.[R13]</li>
+    <li><b>Memory demo (M6)</b> is a toy illustration of pattern completion, not a model of how real brain circuits store memories.</li>
+  </ol>
+</section>
+
+<section id="references" class="page-section references">
+  <h2>Sources</h2>
+  <ol>
+    <li id="ref-R1"><b>R1</b><span>Azevedo et al. (2009). <i>Equal numbers of neuronal and nonneuronal cells make the human brain an isometrically scaled-up primate brain.</i> J. Comp. Neurol. 513:532–541. <a href="https://doi.org/10.1002/cne.21974">doi.org/10.1002/cne.21974</a></span></li>
+    <li id="ref-R2"><b>R2</b><span>Carlsmith, J. (2020). <i>How Much Computational Power Does It Take to Match the Human Brain?</i> Open Philanthropy. <a href="https://www.openphilanthropy.org/research/how-much-computational-power-does-it-take-to-match-the-human-brain/">openphilanthropy.org</a></span></li>
+    <li id="ref-R3"><b>R3</b><span>Beniaguev, Segev &amp; London (2021). <i>Single cortical neurons as deep artificial neural networks.</i> Neuron 109(17). <a href="https://doi.org/10.1016/j.neuron.2021.07.002">doi.org/10.1016/j.neuron.2021.07.002</a></span></li>
+    <li id="ref-R4"><b>R4</b><span>Tom's Hardware. <i>Nvidia Hopper H100 SXM5 pictured</i> (80B transistors, 700 W). <a href="https://www.tomshardware.com/news/nvidia-hopper-h100-sxm5-pictured">tomshardware.com</a></span></li>
+    <li id="ref-R5"><b>R5</b><span>Google Research (2021). <i>A Browsable Petascale Reconstruction of the Human Cortex</i> (H01). <a href="https://research.google/blog/a-browsable-petascale-reconstruction-of-the-human-cortex/">research.google</a></span></li>
+    <li id="ref-R6"><b>R6</b><span>ScienceAlert. <i>Amazingly detailed images reveal a single cubic millimeter of human brain in 3D.</i> <a href="https://www.sciencealert.com/amazingly-detailed-images-reveal-a-single-cubic-millimeter-of-human-brain-in-3d">sciencealert.com</a></span></li>
+    <li id="ref-R7"><b>R7</b><span>White et al. (1986). <i>The Structure of the Nervous System of the Nematode C. elegans</i> (summary via OpenWorm). <a href="https://openworm.org/ConnectomeToolbox/White_1986/">openworm.org</a></span></li>
+    <li id="ref-R8"><b>R8</b><span>Asterisk Magazine. <i>We Can, Must, and Will Simulate Nematode Brains.</i> <a href="https://asteriskmag.com/issues/09/we-can-must-and-will-simulate-nematode-brains">asteriskmag.com</a></span></li>
+    <li id="ref-R9"><b>R9</b><span>Wellcome. <i>Scaling up connectomics.</i> <a href="https://wellcome.org/insights/reports/scaling-connectomics">wellcome.org</a></span></li>
+    <li id="ref-R10"><b>R10</b><span>Berg, S. et al. (2026). <i>Sexual dimorphism in the complete Drosophila male central nervous system connectome.</i> Cell 189(18):5504–5526. Published 3 Sept 2026. <a href="https://doi.org/10.1016/j.cell.2026.08.015">doi.org/10.1016/j.cell.2026.08.015</a> (<a href="https://www.eurekalert.org/news-releases/1141929">press release</a>)</span></li>
+    <li id="ref-R11"><b>R11</b><span>NVIDIA Technical Blog. <i>NVIDIA Hopper Architecture In-Depth</i> (H100 SXM5: 80 billion transistors, 16,896 FP32 CUDA cores, 700 W TDP). <a href="https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/">developer.nvidia.com</a></span></li>
+    <li id="ref-R12"><b>R12</b><span>Siemens EDA blog (2010). <i>Fundamentals of SI (Part 2): Transmission lines</i> (signals travel ~6 inches/ns on a circuit board, about half light speed). <a href="https://blogs.sw.siemens.com/electronic-systems-design/2010/05/03/fundamentals-of-si-part-2-transmission-lines/">blogs.sw.siemens.com</a></span></li>
+    <li id="ref-R13"><b>R13</b><span>Lennie, P. (2003). <i>The cost of cortical computation.</i> Current Biology 13(6):493–497. <a href="https://doi.org/10.1016/s0960-9822(03)00135-0">doi.org/10.1016/s0960-9822(03)00135-0</a></span></li>
+    <li id="ref-R14"><b>R14</b><span>NVIDIA. <i>H100 PCIe GPU Product Brief</i>, PB-11133-001_v02 (30 Nov 2022): base 1,125 MHz, boost 1,755 MHz. Third-party-hosted copy. <a href="https://openzeka.com/wp-content/uploads/2023/12/PB-11133-001_v01.pdf">openzeka.com (PDF)</a></span></li>
+  </ol>
+  <p class="note"><b>Textbook values</b> (resting potential, threshold, conduction speed, firing rate, brain power ≈ 20 W) are standard neuroscience figures with no single linked source here.</p>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Part of <a href="/">learn.nandalogic.com</a>. No tracking, no cookies. Self-check progress stays in this browser.</p>
+    <p>Next: <a href="/brain-vs-computer/transistors/">Inside the switch: transistors, logic, and bits</a></p>
+  </div>
+</footer>
+</body>
+</html>

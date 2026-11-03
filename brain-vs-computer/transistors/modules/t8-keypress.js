@@ -37,22 +37,22 @@
       s.appendChild(svg("text", { x: 50, y: 64, "text-anchor": "middle", class: "g-label k-key" }, "A"));
       return s;
     },
-    function () { // 2 scan
+    function () { // 2 scan: at(sec) energizes column floor(sec / 0.6) mod 4
       var s = svg("svg", { viewBox: "0 0 220 130", role: "img", "aria-label": "The keyboard energizes one column at a time and reads the rows" });
       var col = svg("g"); s.appendChild(col);
       grid(s, 0);
-      var k = 0;
-      function draw() {
+      var shown = -1;
+      function at(sec) {
+        var k = Math.floor(sec / 0.6 + 1e-9) % 4;
+        if (k === shown) return;
+        shown = k;
         col.innerHTML = "";
         col.appendChild(svg("rect", { x: 40 + k * 40, y: 14, width: 20, height: 106, rx: 4, class: "k-col" }));
         if (k === 0) col.appendChild(svg("circle", { cx: 50, cy: 60, r: 9, class: "k-press" }));
       }
-      draw();
-      if (!S.reducedMotion()) {
-        var t = setInterval(function () { if (!s.isConnected) { clearInterval(t); return; } k = (k + 1) % 4; draw(); }, 600);
-      }
+      at(0);
       s.appendChild(svg("text", { x: 110, y: 10, "text-anchor": "middle", class: "g-label muted-text" }, "columns energized one at a time"));
-      return s;
+      return { node: s, at: at };
     },
     function () { // 3 code not letter
       return el("div", { class: "k-boxes" }, [
@@ -112,22 +112,14 @@
         }))
       ]);
     },
-    function () { // 11 refresh
+    function () { // 11 refresh: at(sec) moves the scan line
       var s = svg("svg", { viewBox: "0 0 220 120", role: "img", "aria-label": "A screen being redrawn top to bottom from the framebuffer" });
       s.appendChild(svg("rect", { x: 40, y: 10, width: 140, height: 90, rx: 6, class: "scr" }));
       s.appendChild(svg("text", { x: 110, y: 64, "text-anchor": "middle", class: "scr-a" }, "A"));
       var line = svg("rect", { x: 40, y: 10, width: 140, height: 4, class: "scan" });
       s.appendChild(line);
       s.appendChild(svg("text", { x: 110, y: 116, "text-anchor": "middle", class: "g-label" }, "redrawn 60 or 120 times a second"));
-      if (!S.reducedMotion()) {
-        var t0 = performance.now();
-        (function step(t) {
-          if (!s.isConnected) return;
-          line.setAttribute("y", 10 + ((t - t0) / 1500 % 1) * 86); // slowed far down
-          requestAnimationFrame(step);
-        })(t0);
-      }
-      return s;
+      return { node: s, at: function (sec) { line.setAttribute("y", 10 + (sec / 1.5 % 1) * 86); } }; // one sweep per 1.5 s, slowed far down
     },
     function () { // 12 light
       var s = svg("svg", { viewBox: "0 0 260 130", role: "img", "aria-label": "One pixel made of red, green and blue subpixels; LCD uses a backlight and one transistor per pixel, OLED pixels make their own light with at least two transistors" });
@@ -159,34 +151,40 @@
     return s;
   }
 
-  S.module("t8", function (root, host) {
+  S.module("t8", function (root) {
     var items = Array.prototype.slice.call(document.querySelectorAll("#keypress .steps-text li"));
-    var i = 0;
+    var N = G.length, SPU = 6, cur = -1, anim = null, tl; // SPU: seconds per step when playing
     var dots = el("div", { class: "k-dots", role: "tablist", "aria-label": "Steps" });
     var dotBtns = G.map(function (_, k) {
       var b = el("button", { type: "button", role: "tab", class: "k-dot", "aria-label": "Step " + (k + 1) }, String(k + 1));
-      b.addEventListener("click", function () { go(k); });
+      b.addEventListener("click", function () { tl.seek(k); });
       dots.appendChild(b);
       return b;
     });
     var stage = el("div", { class: "k-stage", role: "tabpanel", "aria-live": "polite" });
-    var back = el("button", { type: "button" }, "← Back");
-    var next = el("button", { type: "button", class: "primary" }, "Next →");
-    back.addEventListener("click", function () { go(i - 1); });
-    next.addEventListener("click", function () { go(i + 1); });
-    root.append(dots, stage, el("div", { class: "btn-row k-nav" }, [back, next]));
 
-    function go(k) {
-      i = Math.max(0, Math.min(G.length - 1, k));
-      dotBtns.forEach(function (b, n) { b.setAttribute("aria-selected", String(n === i)); b.classList.toggle("seen", n < i); });
-      back.disabled = i === 0; next.disabled = i === G.length - 1;
-      stage.innerHTML = "";
-      var text = items[i] ? items[i].cloneNode(true) : el("span", null, "");
-      var p = el("p", { class: "k-text" }, [el("span", { class: "k-num" }, (i + 1) + " / " + G.length + " ")]);
-      while (text.firstChild) p.appendChild(text.firstChild);
-      stage.appendChild(el("div", { class: "k-graphic" }, G[i]()));
-      stage.appendChild(p);
+    // draw(t): step = floor(t); time inside the step drives the scan (2) and refresh (11) graphics.
+    function draw(t) {
+      var k = S.clamp(Math.floor(t + 1e-9), 0, N - 1);
+      if (k !== cur) {
+        cur = k;
+        dotBtns.forEach(function (b, n) { b.setAttribute("aria-selected", String(n === k)); b.classList.toggle("seen", n < k); });
+        stage.innerHTML = "";
+        var g = G[k]();
+        anim = g.at ? g : null;
+        var text = items[k] ? items[k].cloneNode(true) : el("span", null, "");
+        var p = el("p", { class: "k-text" }, [el("span", { class: "k-num" }, (k + 1) + " / " + N + " ")]);
+        while (text.firstChild) p.appendChild(text.firstChild);
+        stage.appendChild(el("div", { class: "k-graphic" }, anim ? g.node : g));
+        stage.appendChild(p);
+      }
+      if (anim) anim.at(Math.max(0, t - k) * SPU);
     }
-    go(0);
+    tl = S.timeline({
+      id: "t8", duration: N, start: 0, secPerUnit: SPU, draw: draw, stepper: true, caption: false,
+      beats: G.map(function (_, k) { return { t: k, label: function () { return "Step " + (k + 1) + " of " + N + ". " + (items[k] ? items[k].textContent.trim() : ""); } }; }),
+      labels: { play: "▶ Play all 12 steps", replay: "▶ Play again" }
+    });
+    root.append(dots, stage, tl.node);
   });
 })();

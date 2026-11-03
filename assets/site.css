@@ -167,6 +167,17 @@ button[aria-pressed="true"].toggle { background: var(--ink); color: var(--bg); b
 .seg button[aria-checked="true"], .seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
 
 input[type="range"] { width: 100%; min-height: var(--tap); accent-color: var(--ink); }
+
+/* seekable timeline (Site.timeline): scrubber + Back / Play / Next + step caption */
+.tl { margin: .5rem 0 .75rem; }
+.tl-scrub { position: relative; }
+.tl-scrub input[type="range"] { display: block; margin: 0; }
+.tl-ticks { position: relative; height: 8px; margin: -10px 9px 0; pointer-events: none; }
+.tl-ticks span { position: absolute; top: 0; width: 2px; height: 8px; margin-left: -1px; border-radius: 1px; background: var(--ink-3); }
+.tl-btns { margin: .4rem 0 .25rem; flex-wrap: nowrap; }
+.tl-btns .tl-play { flex: 1 1 0; min-width: 0; line-height: 1.2; }
+.tl-btns .tl-step { flex: 0 0 auto; padding: .4rem .7rem; white-space: nowrap; }
+.tl-status { margin: .25rem 0 0; min-height: 2.6em; font-size: .9rem; color: var(--ink-2); }
 label { cursor: pointer; }
 
 /* ---------- identity: brain / computer / quantum ---------- */

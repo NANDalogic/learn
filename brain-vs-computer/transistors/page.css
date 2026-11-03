@@ -74,6 +74,8 @@
 .bit-btn.is-0 { background: var(--off); color: var(--off-ink); }
 .add-dec { font-family: var(--mono); font-weight: 700; padding-left: .3rem; }
 .add-chain { display: grid; grid-template-columns: repeat(4, 1fr); gap: .3rem; margin: .5rem 0; }
+.add-track { position: relative; height: 1.9rem; margin: .5rem 0 -.25rem; }
+.add-chip { position: absolute; top: 50%; transform: translate(-50%, -50%); font-size: .75rem; white-space: nowrap; pointer-events: none; visibility: hidden; box-shadow: 0 1px 4px rgb(0 0 0 / .25); }
 .fa { flex-direction: column; align-items: stretch; gap: .15rem; padding: .4rem .35rem; font-size: .74rem; min-width: 0; text-align: left; position: relative; }
 .fa .bit { min-width: 1.5em; font-size: .78rem; }
 .fa-title { font-weight: 700; font-size: .72rem; color: var(--ink-2); }

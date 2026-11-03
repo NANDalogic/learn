@@ -1,5 +1,6 @@
 /* learn.nandalogic.com: shared interactive widgets (needs site.js first)
    - Site.module(id, init): lazy-init a module's .module-body
+   - Site.timeline(): seekable play/pause/step/scrub controller (draw(t) is a pure function of time)
    - Site.segmented(): radio-style segmented control
    - Site.cmos: evaluate + draw CMOS switch networks
    - Site.selfCheck(): tap-to-match game + quiz with saved progress */
@@ -24,6 +25,75 @@
     }
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go);
     else go();
+  };
+
+  /* ---------- seekable timeline ----------
+     The picture is a pure function of time: cfg.draw(t) must show the same frame for the same t,
+     however you got there (play, scrub, Back/Next). That's what lets narration drive a module later.
+     cfg = { id, duration, start, secPerUnit, beats: [{t, label: string|fn}], draw(t), labels: {play, pause, resume, replay} }
+     Every timeline registers in Site.timelines[id] (seek, play, pause, time, beats). */
+  S.timelines = {};
+  S.timeline = function (cfg) {
+    var D = cfg.duration, beats = cfg.beats, spu = cfg.secPerUnit || 1, EPS = 1e-6;
+    var L = Object.assign({ play: "▶ Play", pause: "❚❚ Pause", resume: "▶ Resume", replay: "▶ Play again" }, cfg.labels || {});
+    var t = S.clamp(cfg.start == null ? 0 : cfg.start, 0, D), clock = t, playing = false, raf = null, last = 0, said = null;
+
+    var back = el("button", { type: "button", class: "tl-step", "aria-label": "Back one step" }, "◀ Back");
+    var play = el("button", { type: "button", class: "primary tl-play" });
+    var next = el("button", { type: "button", class: "tl-step", "aria-label": "Forward one step" }, "Next ▶");
+    var range = el("input", { type: "range", min: "0", max: String(D), step: "0.01", "aria-label": "Playback position" });
+    var ticks = el("div", { class: "tl-ticks", "aria-hidden": "true" }, beats.map(function (b) { return el("span", { style: "left:" + (b.t / D * 100) + "%" }); }));
+    var status = el("p", { class: "tl-status", "aria-live": "polite" });
+    var node = el("div", { class: "tl" }, [el("div", { class: "tl-scrub" }, [range, ticks]), el("div", { class: "btn-row tl-btns" }, [back, play, next]), status]);
+
+    function beatAt(x) { var i = 0; beats.forEach(function (b, k) { if (b.t <= x + EPS) i = k; }); return i; }
+    function render() {
+      range.value = String(t);
+      cfg.draw(t);
+      var b = beats[beatAt(t)], text = typeof b.label === "function" ? b.label() : b.label;
+      if (text !== said) { said = text; status.textContent = text; range.setAttribute("aria-valuetext", text); }
+      play.textContent = playing ? L.pause : (t >= D - EPS ? L.replay : (t <= EPS ? L.play : L.resume));
+      play.setAttribute("aria-pressed", String(playing));
+      back.disabled = t <= EPS;
+      next.disabled = t >= D - EPS;
+    }
+    function seek(x) { t = clock = S.clamp(x, 0, D); render(); }
+    function tick(now) {
+      clock += S.clamp((now - last) / 1000, 0, 0.1) / spu; last = now; // first frame's timestamp can predate start()
+      // Reduced motion: hold each step, then jump to the next (no in-between frames).
+      t = S.reducedMotion() ? beats[beatAt(clock)].t : clock;
+      if (clock >= D) { t = clock = D; playing = false; raf = null; }
+      else raf = requestAnimationFrame(tick);
+      render();
+    }
+    function start() {
+      if (playing) return;
+      if (t >= D - EPS) t = clock = 0;
+      playing = true; last = performance.now();
+      raf = requestAnimationFrame(tick);
+      render();
+    }
+    function pause() { playing = false; if (raf) cancelAnimationFrame(raf); raf = null; render(); }
+    function step(dir) {
+      pause();
+      var target = dir > 0 ? D : 0;
+      beats.forEach(function (b) {
+        if (dir > 0 && b.t > t + EPS && b.t < target) target = b.t;
+        if (dir < 0 && b.t < t - EPS && b.t > target) target = b.t;
+      });
+      seek(target);
+    }
+
+    play.addEventListener("click", function () { if (playing) pause(); else start(); });
+    back.addEventListener("click", function () { step(-1); });
+    next.addEventListener("click", function () { step(1); });
+    range.addEventListener("input", function () { if (playing) { playing = false; cancelAnimationFrame(raf); raf = null; } seek(+range.value); });
+    S.watchVisible(node, function (v) { if (!v && playing) pause(); });
+
+    var api = { node: node, seek: function (x) { pause(); seek(x); }, play: start, pause: pause, time: function () { return t; }, playing: function () { return playing; }, beats: beats, duration: D, redraw: render };
+    if (cfg.id) S.timelines[cfg.id] = api;
+    render();
+    return api;
   };
 
   /* ---------- segmented control ---------- */

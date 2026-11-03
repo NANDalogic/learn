@@ -30,36 +30,41 @@
   /* ---------- seekable timeline ----------
      The picture is a pure function of time: cfg.draw(t) must show the same frame for the same t,
      however you got there (play, scrub, Back/Next). That's what lets narration drive a module later.
-     cfg = { id, duration, start, secPerUnit, beats: [{t, label: string|fn}], draw(t), labels: {play, pause, resume, replay} }
-     Every timeline registers in Site.timelines[id] (seek, play, pause, time, beats). */
+     cfg = { id, duration, start, secPerUnit, beats: [{t, label: string|fn}], draw(t),
+             labels: {play, pause, resume, replay},
+             loop: true      → playback wraps to 0 instead of stopping (ambient animations)
+             stepper: true   → Back/Next always move one whole beat (slideshow-style modules)
+             caption: false  → hide the step caption (the module shows its own text) }
+     Every timeline registers in Site.timelines[id] (seek, play, pause, time, beats, duration). */
   S.timelines = {};
   S.timeline = function (cfg) {
-    var D = cfg.duration, beats = cfg.beats, spu = cfg.secPerUnit || 1, EPS = 1e-6;
+    var D = cfg.duration, beats = cfg.beats, n = beats.length, spu = cfg.secPerUnit || 1, EPS = 1e-6;
     var L = Object.assign({ play: "▶ Play", pause: "❚❚ Pause", resume: "▶ Resume", replay: "▶ Play again" }, cfg.labels || {});
     var t = S.clamp(cfg.start == null ? 0 : cfg.start, 0, D), clock = t, playing = false, raf = null, last = 0, said = null;
 
-    var back = el("button", { type: "button", class: "tl-step", "aria-label": "Back one step" }, "◀ Back");
-    var play = el("button", { type: "button", class: "primary tl-play" });
-    var next = el("button", { type: "button", class: "tl-step", "aria-label": "Forward one step" }, "Next ▶");
+    var back = el("button", { type: "button", class: "player-step", "aria-label": "Back one step" }, "◀ Back");
+    var play = el("button", { type: "button", class: "primary player-play" });
+    var next = el("button", { type: "button", class: "player-step", "aria-label": "Forward one step" }, "Next ▶");
     var range = el("input", { type: "range", min: "0", max: String(D), step: "0.01", "aria-label": "Playback position" });
-    var ticks = el("div", { class: "tl-ticks", "aria-hidden": "true" }, beats.map(function (b) { return el("span", { style: "left:" + (b.t / D * 100) + "%" }); }));
-    var status = el("p", { class: "tl-status", "aria-live": "polite" });
-    var node = el("div", { class: "tl" }, [el("div", { class: "tl-scrub" }, [range, ticks]), el("div", { class: "btn-row tl-btns" }, [back, play, next]), status]);
+    var ticks = el("div", { class: "player-ticks", "aria-hidden": "true" }, beats.map(function (b) { return el("span", { style: "left:" + (b.t / D * 100) + "%" }); }));
+    var status = el("p", { class: "player-status", "aria-live": "polite" });
+    var node = el("div", { class: "player" }, [el("div", { class: "player-scrub" }, [range, ticks]), el("div", { class: "btn-row player-btns" }, [back, play, next]), cfg.caption === false ? null : status]);
 
     function beatAt(x) { var i = 0; beats.forEach(function (b, k) { if (b.t <= x + EPS) i = k; }); return i; }
     function render() {
       range.value = String(t);
       cfg.draw(t);
-      var b = beats[beatAt(t)], text = typeof b.label === "function" ? b.label() : b.label;
+      var i = beatAt(t), b = beats[i], text = typeof b.label === "function" ? b.label() : b.label;
       if (text !== said) { said = text; status.textContent = text; range.setAttribute("aria-valuetext", text); }
-      play.textContent = playing ? L.pause : (t >= D - EPS ? L.replay : (t <= EPS ? L.play : L.resume));
+      play.textContent = playing ? L.pause : (!cfg.loop && t >= D - EPS ? L.replay : (t <= EPS ? L.play : L.resume));
       play.setAttribute("aria-pressed", String(playing));
-      back.disabled = t <= EPS;
-      next.disabled = t >= D - EPS;
+      back.disabled = cfg.stepper ? i === 0 : t <= EPS;
+      next.disabled = cfg.stepper ? i === n - 1 : t >= D - EPS;
     }
     function seek(x) { t = clock = S.clamp(x, 0, D); render(); }
     function tick(now) {
       clock += S.clamp((now - last) / 1000, 0, 0.1) / spu; last = now; // first frame's timestamp can predate start()
+      if (clock >= D && cfg.loop) clock = clock % D;
       // Reduced motion: hold each step, then jump to the next (no in-between frames).
       t = S.reducedMotion() ? beats[beatAt(clock)].t : clock;
       if (clock >= D) { t = clock = D; playing = false; raf = null; }
@@ -76,6 +81,7 @@
     function pause() { playing = false; if (raf) cancelAnimationFrame(raf); raf = null; render(); }
     function step(dir) {
       pause();
+      if (cfg.stepper) { seek(beats[S.clamp(beatAt(t) + dir, 0, n - 1)].t); return; }
       var target = dir > 0 ? D : 0;
       beats.forEach(function (b) {
         if (dir > 0 && b.t > t + EPS && b.t < target) target = b.t;

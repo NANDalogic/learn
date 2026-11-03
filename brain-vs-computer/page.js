@@ -536,7 +536,7 @@
     root.appendChild(chart);
     root.appendChild(el("p", { class: "small muted" }, "Board-wiring speed from [R12]. Each gridline is 1,000× faster than the last. The chip signal is " + S.fmt(BOARD / NERVE) + "× faster."));
 
-    // --- race
+    // --- race (seekable: draw(sec) places both runners from slowed-down time alone)
     root.appendChild(el("h4", null, "Race over 15 cm, slowed down a billion times"));
     var raceSvg = svg("svg", { viewBox: "0 0 320 84", role: "img", "aria-label": "Race track, 15 centimetres" });
     function lane(y, cls, name) {
@@ -549,33 +549,32 @@
     raceSvg.appendChild(svg("line", { x1: 300, x2: 300, y1: 10, y2: 80, class: "finish" }));
     var dc = lane(30, "is-computer", "Board wiring");
     var dn = lane(70, "is-brain", "Nerve (100 m/s)");
-    var raceBtn = el("button", { type: "button", class: "primary" }, "Start race");
-    var raceOut = el("p", { class: "race-out", "aria-live": "polite" }, "1 nanosecond of real time = 1 second here.");
-    root.appendChild(raceSvg);
-    root.appendChild(el("div", { class: "btn-row" }, [raceBtn]));
-    root.appendChild(raceOut);
+    var raceOut = el("p", { class: "race-out" });
     var nerveSlowSec = (TRACK / NERVE) * SLOW, chipSlowSec = (TRACK / BOARD) * SLOW;
-    var days = nerveSlowSec / 86400;
-    raceBtn.addEventListener("click", function () {
-      raceBtn.disabled = true;
-      var t0 = performance.now(), RUN = 5000;
-      function frac(sec, total) { return Math.min(1, sec / total); }
-      function set(sec) {
-        dc.setAttribute("cx", 10 + 290 * frac(sec, chipSlowSec));
-        dn.setAttribute("cx", 10 + 290 * frac(sec, nerveSlowSec));
-        var pct = (frac(sec, nerveSlowSec) * 100);
-        raceOut.textContent = (sec >= chipSlowSec ? "Chip signal: finished in " + chipSlowSec.toFixed(0) + " s (1 ns real). " : "Running… ") +
-          "Nerve signal: " + pct.toPrecision(2) + "% of the way. At this pace it finishes in about " + days.toFixed(0) + " days.";
-      }
-      if (S.reducedMotion()) { set(RUN / 1000); raceBtn.disabled = false; return; }
-      (function step(t) {
-        var sec = (t - t0) / 1000;
-        set(Math.min(sec, RUN / 1000));
-        if (t - t0 < RUN) requestAnimationFrame(step); else raceBtn.disabled = false;
-      })(t0);
+    var days = nerveSlowSec / 86400, RUN = 5;
+    function frac(sec, total) { return Math.min(1, sec / total); }
+    function drawRace(sec) {
+      dc.setAttribute("cx", 10 + 290 * frac(sec, chipSlowSec));
+      dn.setAttribute("cx", 10 + 290 * frac(sec, nerveSlowSec));
+      var pct = frac(sec, nerveSlowSec) * 100;
+      raceOut.textContent = sec <= 0 ? "1 nanosecond of real time = 1 second here." :
+        (sec >= chipSlowSec ? "Chip signal: finished in " + chipSlowSec.toFixed(0) + " s (1 ns real). " : "Running… ") +
+        "Nerve signal: " + pct.toPrecision(2) + "% of the way. At this pace it finishes in about " + days.toFixed(0) + " days.";
+    }
+    var raceTl = S.timeline({
+      id: "m5-race", duration: RUN, start: 0, draw: drawRace,
+      beats: [
+        { t: 0, label: "Ready. Both signals start together." },
+        { t: chipSlowSec, label: "The chip signal finished: 15 cm in 1 nanosecond of real time." },
+        { t: RUN, label: "The nerve signal has barely left the start. It needs about " + days.toFixed(0) + " days at this pace." }
+      ],
+      labels: { play: "▶ Start race", replay: "▶ Race again" }
     });
+    root.appendChild(raceSvg);
+    root.appendChild(raceTl.node);
+    root.appendChild(raceOut);
 
-    // --- parallelism
+    // --- parallelism (seekable + looping: which dots are lit is a pure function of time)
     root.appendChild(el("h4", null, "Parallelism"));
     var BR = 20, BC = 20, CR = 8, CC = 8;
     var brainDots = [], coreSq = [];
@@ -590,45 +589,35 @@
       csvg.appendChild(q); coreSq.push(q);
     }
     var clockTxt = el("span", { class: "clock-tick" }, "tick 0");
-    var playBtn = el("button", { type: "button", class: "toggle", "aria-pressed": "false" }, "Play");
     root.appendChild(el("div", { class: "split par" }, [
       el("div", { class: "side is-brain" }, [el("span", { class: "tag" }, "Brain"), bsvg,
         el("p", { class: "small" }, ["~86 billion neurons,[R1] no clock. Each dot ≈ " + S.fmt(86e9 / (BR * BC) / 1e6) + " million neurons. Only a sprinkle is strongly active at once (possibly <1%).[R13]"])]),
       el("div", { class: "side is-computer" }, [el("span", { class: "tag" }, "H100 chip"), csvg,
         el("p", { class: "small" }, ["16,896 cores, one clock.[R11] Each square ≈ " + S.fmt(16896 / (CR * CC)) + " cores. ", clockTxt])])
     ]));
-    root.appendChild(el("div", { class: "btn-row" }, [playBtn, el("span", { class: "small muted" }, "Animation is slowed far below real speed.")]));
 
-    var playing = false, visible = true, timers = [], tick = 0;
-    S.watchVisible(root, function (v) { visible = v; });
-    function snapshot() {
-      brainDots.forEach(function (d, i) { d.classList.toggle("lit", i % 97 === 13); });
-      coreSq.forEach(function (q) { q.classList.add("lit"); });
+    // Every 0.1 s one "random" dot lights for 0.4 s (~1% lit at once). A fixed hash of the
+    // time slot picks the dot, so the same moment always shows the same dots.
+    var TICK = 0.7, FLASH = 0.25, SLOT = 0.1, HOLD = 4, PAR_LEN = 10 * TICK;
+    function hash(n) {
+      n = (n | 0) ^ 0x5bd1e995; n = Math.imul(n ^ (n >>> 15), 0x2c1b3c6d);
+      n = Math.imul(n ^ (n >>> 12), 0x297a2d39); return (n ^ (n >>> 15)) >>> 0;
     }
-    function start() {
-      timers.push(setInterval(function () {
-        if (!visible) return;
-        // ~1% lit at any moment: each 100 ms light ~1 random dot for ~400 ms
-        var d = brainDots[Math.floor(Math.random() * brainDots.length)];
-        d.classList.add("lit");
-        setTimeout(function () { d.classList.remove("lit"); }, 400);
-      }, 100));
-      timers.push(setInterval(function () {
-        if (!visible) return;
-        tick++; clockTxt.textContent = "tick " + tick;
-        coreSq.forEach(function (q) { q.classList.add("lit"); });
-        setTimeout(function () { coreSq.forEach(function (q) { q.classList.remove("lit"); }); }, 250);
-      }, 700));
+    var litNow = {};
+    function drawPar(t) {
+      var slot = Math.floor(t / SLOT + 1e-9), want = {};
+      for (var k = 0; k < HOLD; k++) want[hash(slot - k + 1000) % brainDots.length] = true;
+      brainDots.forEach(function (dot, i) { if (!!want[i] !== !!litNow[i]) dot.classList.toggle("lit", !!want[i]); });
+      litNow = want;
+      var n = Math.floor(t / TICK + 1e-9), on = n >= 1 && t - n * TICK < FLASH;
+      if (coreSq[0].classList.contains("lit") !== on) coreSq.forEach(function (sq) { sq.classList.toggle("lit", on); });
+      clockTxt.textContent = "tick " + n;
     }
-    function stop() { timers.forEach(clearInterval); timers = []; }
-    playBtn.addEventListener("click", function () {
-      playing = !playing;
-      playBtn.setAttribute("aria-pressed", String(playing));
-      playBtn.textContent = playing ? "Pause" : "Play";
-      if (playing) { brainDots.forEach(function (d) { d.classList.remove("lit"); }); coreSq.forEach(function (q) { q.classList.remove("lit"); }); start(); }
-      else { stop(); snapshot(); }
-    });
-    snapshot();
+    var parBeats = [];
+    for (var b = 0; b <= 10; b++) parBeats.push({ t: b * TICK, label: b === 0 ? "Before the first clock tick." : "Clock tick " + b + ": all 64 squares step together. The brain dots keep firing on their own schedule." });
+    var parTl = S.timeline({ id: "m5-par", duration: PAR_LEN, start: TICK, loop: true, draw: drawPar, beats: parBeats });
+    root.appendChild(parTl.node);
+    root.appendChild(el("p", { class: "small muted" }, "Animation is slowed far below real speed."));
 
     // --- power
     root.appendChild(el("h4", null, "Power"));

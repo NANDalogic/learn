@@ -676,12 +676,16 @@
     pats.forEach(function (p) { for (var i = 0; i < N; i++) for (var j = 0; j < N; j++) if (i !== j) Wt[i][j] += p[i] * p[j] / N; });
 
     var s = new Array(N).fill(0); // 1 on, -1 off, 0 unknown
+    // Recall plays on a Site.timeline (11/3/2026): pressing Recall works out the whole run first (seeded order, no
+    // Math.random), so the grid at time t is a pure function of t and can be paused, stepped and scrubbed.
+    var rng = mulberry(61), run = null, tl = null;
+    var tlHost = el("div", { class: "hop-player" });
     var gridEl = el("div", { class: "hgrid", role: "group", "aria-label": "Network units, 6 by 6. Tap a unit to flip it." });
     var units = [];
     for (i = 0; i < N; i++) {
       (function (k) {
         var b = el("button", { type: "button", class: "hu", "aria-label": "Unit " + (Math.floor(k / 6) + 1) + "," + (k % 6 + 1) });
-        b.addEventListener("click", function () { if (running) return; s[k] = s[k] === 1 ? -1 : 1; draw(); hres.textContent = ""; });
+        b.addEventListener("click", function () { settle(); s[k] = s[k] === 1 ? -1 : 1; draw(); hres.textContent = ""; });
         gridEl.appendChild(b); units.push(b);
       })(i);
     }
@@ -699,61 +703,78 @@
     var recallBtn = el("button", { type: "button", class: "primary" }, "Recall");
     var clearBtn = el("button", { type: "button" }, "Clear");
     var hres = el("p", { class: "hop-out", "aria-live": "polite" });
-    var running = false;
 
     partialBtn.addEventListener("click", function () {
+      settle();
       var p = pats[names.indexOf(cur)];
       s = p.map(function (v, k) { return k < 18 ? v : 0; });
       draw(); hres.textContent = "Top half of " + cur + " shown; the bottom half is unknown (?). Now press Recall.";
     });
     noisyBtn.addEventListener("click", function () {
+      settle();
       var p = pats[names.indexOf(cur)], q = +noise.value / 100;
-      s = p.map(function (v) { return Math.random() < q ? -v : v; });
+      s = p.map(function (v) { return rng() < q ? -v : v; });
       draw(); hres.textContent = cur + " with " + noise.value + "% of units flipped. Now press Recall.";
     });
-    clearBtn.addEventListener("click", function () { s = new Array(N).fill(0); draw(); hres.textContent = ""; });
+    clearBtn.addEventListener("click", function () { settle(); s = new Array(N).fill(0); draw(); hres.textContent = ""; });
     recallBtn.addEventListener("click", recall);
 
-    function recall() {
-      if (running) return;
-      running = true; recallBtn.disabled = true;
-      var order = [], sweeps = 0, changed = 0;
-      function refill() { order = []; for (var k = 0; k < N; k++) order.push(k); order.sort(function () { return Math.random() - .5; }); }
+    // The grid as the timeline shows it (or the editable grid when no recall is loaded).
+    function shown() { return run ? run.states[Math.min(run.states.length - 1, Math.floor(tl.time() + 1e-6))] : s; }
+    // Leave the recall player: the frame on screen becomes the editable grid again.
+    function settle() {
+      if (!run) return;
+      tl.pause(); s = shown().slice(); run = null; tl = null; tlHost.replaceChildren();
+    }
+    // One unit update per timeline unit, in a shuffled order each sweep, until a sweep changes nothing (max 10).
+    function plan(start) {
+      var st = start.slice(), states = [st.slice()], sweeps = 0, changed = 0, order = [];
+      var beats = [{ t: 0, label: "Sweep 1: one unit at a time, in shuffled order, each unit flips to agree with what its connections vote for." }];
+      function refill() {
+        order = []; for (var k = 0; k < N; k++) order.push(k);
+        for (k = N - 1; k > 0; k--) { var j = Math.floor(rng() * (k + 1)), x = order[k]; order[k] = order[j]; order[j] = x; }
+      }
       refill();
-      function stepOne() {
-        var k = order.pop();
-        var h = 0; for (var j = 0; j < N; j++) h += Wt[k][j] * s[j];
+      for (;;) {
+        var k = order.pop(), h = 0;
+        for (var j = 0; j < N; j++) h += Wt[k][j] * st[j];
         var v = h >= 0 ? 1 : -1;
-        if (v !== s[k]) { s[k] = v; changed++; }
+        if (v !== st[k]) { st[k] = v; changed++; }
+        states.push(st.slice());
         if (!order.length) {
           sweeps++;
-          if (!changed || sweeps >= 10) return true;
+          if (!changed || sweeps >= 10) break;
+          beats.push({ t: states.length - 1, label: "Sweep " + (sweeps + 1) + ": " + changed + " unit" + (changed === 1 ? "" : "s") + " flipped last sweep, so it goes round again." });
           changed = 0; refill();
         }
-        return false;
       }
-      if (S.reducedMotion()) { while (!stepOne()) {} finish(); return; }
-      (function tick() {
-        var fin = false;
-        for (var n = 0; n < 2 && !fin; n++) fin = stepOne();
-        draw();
-        if (fin) finish(); else setTimeout(tick, 22);
-      })();
-    }
-    function finish() {
-      running = false; recallBtn.disabled = false; draw();
       var match = -1;
-      pats.forEach(function (p, k) { if (p.every(function (v, j) { return v === s[j]; })) match = k; });
-      if (match === -1) hres.textContent = "Settled on a mixed-up pattern that isn't any stored memory.";
-      else if (names[match] === cur) hres.textContent = "Recalled: " + names[match] + ". The network filled in the rest.";
-      else hres.textContent = "Recalled: " + names[match] + ", but you cued " + cur + ". The wrong memory came back whole and confident: a false memory.";
+      pats.forEach(function (p, m) { if (p.every(function (x, q) { return x === st[q]; })) match = m; });
+      var cued = cur, result = match === -1 ? "Settled on a mixed-up pattern that isn't any stored memory."
+        : names[match] === cued ? "Recalled: " + names[match] + ". The network filled in the rest."
+        : "Recalled: " + names[match] + ", but you cued " + cued + ". The wrong memory came back whole and confident: a false memory.";
+      beats.push({ t: states.length - 1, label: changed ? "Stopped after 10 sweeps." : "Sweep " + sweeps + " changed nothing, so the network has settled." });
+      return { states: states, beats: beats, result: result };
     }
-    function draw() {
+    function recall() {
+      settle();
+      run = plan(s);
+      var D = run.states.length - 1, r = run;
+      tl = S.timeline({
+        id: "m6-recall", duration: D, start: 0, secPerUnit: 0.011, beats: r.beats,
+        labels: { play: "▶ Play recall", replay: "▶ Replay recall" },
+        draw: function (t) { paint(r.states[Math.min(D, Math.floor(t + 1e-6))]); hres.textContent = t >= D - 1e-6 ? r.result : ""; }
+      });
+      tlHost.replaceChildren(tl.node);
+      tl.play();
+    }
+    function paint(st) {
       units.forEach(function (u, k) {
-        u.className = "hu " + (s[k] === 1 ? "on" : s[k] === -1 ? "off" : "unk");
-        u.setAttribute("aria-pressed", String(s[k] === 1));
+        u.className = "hu " + (st[k] === 1 ? "on" : st[k] === -1 ? "off" : "unk");
+        u.setAttribute("aria-pressed", String(st[k] === 1));
       });
     }
+    function draw() { paint(s); }
     function miniGrid(p) {
       var g = svg("svg", { viewBox: "0 0 36 36", "aria-hidden": "true" });
       p.forEach(function (v, k) { if (v === 1) g.appendChild(svg("rect", { x: (k % 6) * 6 + .5, y: Math.floor(k / 6) * 6 + .5, width: 5, height: 5, rx: 1 })); });
@@ -774,6 +795,7 @@
         el("div", { class: "btn-row" }, [partialBtn, noisyBtn]),
         gridEl,
         el("div", { class: "btn-row" }, [recallBtn, clearBtn]),
+        tlHost,
         hres,
         el("p", { class: "small muted" }, "Try 40% noise a few times: sometimes the wrong memory comes back.")
       ])

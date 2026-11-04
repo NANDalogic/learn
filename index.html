@@ -2,27 +2,34 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>learn.nandalogic.com</title>
 <meta name="description" content="Interactive, sourced explainers from NANDalogic.">
 <meta name="color-scheme" content="light dark">
 <script>try{var t=JSON.parse(localStorage.getItem("theme"));if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
-<link rel="stylesheet" href="/assets/site.css">
-<script src="/assets/site.js" defer></script>
+<link rel="preload" href="https://nandalogic.com/assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="https://nandalogic.com/assets/nandalogic.css?v=1" as="style">
+<link rel="icon" href="https://nandalogic.com/assets/brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="https://nandalogic.com/assets/brand/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="https://nandalogic.com/assets/brand/apple-touch-icon.png">
+<link rel="stylesheet" href="/assets/site.css?v=4">
+<script src="/assets/site.js?v=4" defer></script>
 <style>
   .topic { display: block; text-decoration: none; margin: 1rem 0; padding: 1rem 1.1rem; background: var(--surface); border: 1px solid var(--line); border-top: 4px solid; border-image: linear-gradient(90deg, var(--brain), var(--computer)) 1; }
   .topic h2 { margin: 0 0 .3rem; font-size: 1.3rem; }
   .topic p { margin: 0 0 .5rem; color: var(--ink-2); }
   .subtopic { display: flex; gap: .5rem; align-items: center; min-height: var(--tap); margin-left: 1rem; padding: .4rem .9rem; text-decoration: none; border: 1px solid var(--line); border-left: 4px solid var(--computer); border-radius: 10px; background: var(--surface); }
   .subtopic span { color: var(--ink-2); font-size: .9rem; }
+  .subtopic b { white-space: nowrap; }
 </style>
 </head>
 <body>
 <header class="site-header">
   <div class="bar">
-    <a class="home" href="/">learn</a>
-    <span style="flex:1"></span>
-    <button type="button" class="icon theme-toggle" aria-label="Toggle dark mode">☾</button>
+    <a class="brand" href="https://nandalogic.com" aria-label="NANDalogic home"><svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.79 5.21L16.46 17.88L17.88 16.46L5.21 3.79Z"/><path d="M18.5 4.5h2v11.7h-2zM4.5 18.5h11.7v2H4.5z"/><rect x="0" y="0" width="9" height="9" rx="2.2"/><rect x="15" y="0" width="9" height="9" rx="2.2"/><rect x="0" y="15" width="9" height="9" rx="2.2"/><path fill-rule="evenodd" d="M19.5 15a4.5 4.5 0 1 0 0 9a4.5 4.5 0 1 0 0-9zM19.5 17.4a2.1 2.1 0 1 1 0 4.2a2.1 2.1 0 1 1 0-4.2z"/></svg><span class="wordmark"><b>NAND</b>alogic</span></a>
+    <a class="brand-sub" href="/">learn</a>
+    <span class="spacer"></span>
+    <button type="button" class="icon-btn theme-toggle" aria-label="Switch to dark mode"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
   </div>
 </header>
 <main id="main" class="wrap">
@@ -40,7 +47,10 @@
   </section>
 </main>
 <footer class="site-footer">
-  <div class="wrap"><p>By <a href="https://nandalogic.com">NANDalogic</a>. No tracking, no cookies.</p></div>
+  <div class="wrap">
+    <p class="foot-brand"><svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.79 5.21L16.46 17.88L17.88 16.46L5.21 3.79Z"/><path d="M18.5 4.5h2v11.7h-2zM4.5 18.5h11.7v2H4.5z"/><rect x="0" y="0" width="9" height="9" rx="2.2"/><rect x="15" y="0" width="9" height="9" rx="2.2"/><rect x="0" y="15" width="9" height="9" rx="2.2"/><path fill-rule="evenodd" d="M19.5 15a4.5 4.5 0 1 0 0 9a4.5 4.5 0 1 0 0-9zM19.5 17.4a2.1 2.1 0 1 1 0 4.2a2.1 2.1 0 1 1 0-4.2z"/></svg>By <a href="https://nandalogic.com">NANDalogic</a></p>
+    <p>No tracking, no cookies.</p>
+  </div>
 </footer>
 </body>
 </html>

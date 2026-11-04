@@ -2,14 +2,19 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Inside the Switch: Transistors, Logic, and Bits · learn.nandalogic.com</title>
 <meta name="description" content="What a transistor is, how chips are made, how transistors become gates, adders and memory, how bits become letters on a screen, and how quantum computing differs.">
 <meta name="color-scheme" content="light dark">
 <script>try{var t=JSON.parse(localStorage.getItem("theme"));if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
-<link rel="stylesheet" href="/assets/site.css?v=3">
+<link rel="preload" href="https://nandalogic.com/assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="https://nandalogic.com/assets/nandalogic.css?v=1" as="style">
+<link rel="icon" href="https://nandalogic.com/assets/brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="https://nandalogic.com/assets/brand/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="https://nandalogic.com/assets/brand/apple-touch-icon.png">
+<link rel="stylesheet" href="/assets/site.css?v=4">
 <link rel="stylesheet" href="page.css?v=2">
-<script src="/assets/site.js" defer></script>
+<script src="/assets/site.js?v=4" defer></script>
 <script src="/assets/widgets.js?v=3" defer></script>
 <script src="modules/t1-transistor.js" defer></script>
 <script src="modules/t2-name-vs-ruler.js" defer></script>
@@ -28,7 +33,8 @@
 
 <header class="site-header">
   <div class="bar">
-    <a class="home" href="/">learn</a>
+    <a class="brand" href="https://nandalogic.com" aria-label="NANDalogic home"><svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.79 5.21L16.46 17.88L17.88 16.46L5.21 3.79Z"/><path d="M18.5 4.5h2v11.7h-2zM4.5 18.5h11.7v2H4.5z"/><rect x="0" y="0" width="9" height="9" rx="2.2"/><rect x="15" y="0" width="9" height="9" rx="2.2"/><rect x="0" y="15" width="9" height="9" rx="2.2"/><path fill-rule="evenodd" d="M19.5 15a4.5 4.5 0 1 0 0 9a4.5 4.5 0 1 0 0-9zM19.5 17.4a2.1 2.1 0 1 1 0 4.2a2.1 2.1 0 1 1 0-4.2z"/></svg><span class="wordmark"><b>NAND</b>alogic</span></a>
+    <a class="brand-sub" href="/">learn</a>
     <nav class="section-nav" aria-label="Sections">
       <ol>
         <li><a href="#recap">Recap</a></li>
@@ -46,7 +52,7 @@
         <li><a href="#references">Sources</a></li>
       </ol>
     </nav>
-    <button type="button" class="icon theme-toggle" aria-label="Toggle dark mode">☾</button>
+    <button type="button" class="icon-btn theme-toggle" aria-label="Switch to dark mode"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
   </div>
   <div class="progress" aria-hidden="true"><span></span></div>
 </header>
@@ -833,6 +839,7 @@
 
 <footer class="site-footer">
   <div class="wrap">
+    <p class="foot-brand"><svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.79 5.21L16.46 17.88L17.88 16.46L5.21 3.79Z"/><path d="M18.5 4.5h2v11.7h-2zM4.5 18.5h11.7v2H4.5z"/><rect x="0" y="0" width="9" height="9" rx="2.2"/><rect x="15" y="0" width="9" height="9" rx="2.2"/><rect x="0" y="15" width="9" height="9" rx="2.2"/><path fill-rule="evenodd" d="M19.5 15a4.5 4.5 0 1 0 0 9a4.5 4.5 0 1 0 0-9zM19.5 17.4a2.1 2.1 0 1 1 0 4.2a2.1 2.1 0 1 1 0-4.2z"/></svg>By <a href="https://nandalogic.com">NANDalogic</a></p>
     <p>Part of <a href="/">learn.nandalogic.com</a> · <a href="/brain-vs-computer/">From Matter to Thought</a>. No tracking, no cookies. Self-check progress stays in this browser.</p>
   </div>
 </footer>

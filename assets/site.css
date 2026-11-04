@@ -1,91 +1,36 @@
-/* learn.nandalogic.com: shared styles
-   Brain / Computer / Quantum hues validated for colorblind separation (light + dark).
-   Text stays in ink colors; hues mark identity on swatches, borders and fills. */
+/* learn.nandalogic.com: learn's own styles, on top of the NANDalogic design system.
+   The system (tokens, Inter, header, footer) is imported below into the layer
+   "nandalogic", so every unlayered rule in this file wins over it. Learn keeps its
+   own components (callouts, badges, modules, widgets); their colors come from the
+   system's tokens through the aliases below. Design system source:
+   ~/Documents/1_Projects/Design_Systems/nandalogic/ (adopted 2026-11-03).
+   Learn rule from the system: buttons stay navy/neutral, never orange, so orange
+   always means "brain". */
+@import url("https://nandalogic.com/assets/nandalogic.css?v=1") layer(nandalogic);
 
+/* Old learn names -> system tokens (dark mode follows automatically). */
 :root {
-  color-scheme: light dark;
-  --bg: #fbfaf7;
-  --surface: #ffffff;
-  --surface-2: #f2f0eb;
-  --ink: #1b1d22;
-  --ink-2: #464a53;
-  --ink-3: #6a6f79;
-  --line: #dedad2;
-  --focus: #1b1d22;
+  --bg: var(--page);
+  --surface-2: var(--raised);
+  --ink: var(--text);
+  --ink-2: var(--text-2);
+  --ink-3: var(--text-muted);
+  --line: var(--border);
+  --on: var(--logic-1);
+  --on-ink: var(--logic-1-ink);
+  --off: var(--logic-0);
+  --off-ink: var(--logic-0-ink);
+  --radius: var(--r-lg);
 
-  --brain: #c4511a;
-  --brain-soft: #fbe9df;
-  --computer: #2563c9;
-  --computer-soft: #e3ecfa;
-  --quantum: #a83d9c;
-  --quantum-soft: #f6e4f3;
-
-  --on: #f2b01e;      /* logic 1 fill (always paired with a "1" label) */
-  --on-ink: #1b1d22;
-  --off: #d4d6db;     /* logic 0 fill */
-  --off-ink: #1b1d22;
-
-  --good: #1f7a3d;
+  /* learn-only: analogy-strength ratings (good = system --good) */
   --moderate: #2f6f8f;
   --loose: #9a6200;
   --weak: #b42318;
-
-  --radius: 12px;
-  --tap: 44px;
-  --measure: 44rem;
-  --header-h: 3.25rem;
-  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
-
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #15171c;
-    --surface: #1d2027;
-    --surface-2: #252932;
-    --ink: #eceef2;
-    --ink-2: #c3c7cf;
-    --ink-3: #9aa0ab;
-    --line: #353a45;
-    --focus: #eceef2;
-    --brain: #e0703a;
-    --brain-soft: #3a2419;
-    --computer: #4f8de8;
-    --computer-soft: #1a2a44;
-    --quantum: #c160b6;
-    --quantum-soft: #35203a;
-    --on: #f2b01e;
-    --off: #4a4f5a;
-    --off-ink: #eceef2;
-    --good: #5cc27f;
-    --moderate: #6fb6d8;
-    --loose: #e2a63b;
-    --weak: #f07a6e;
-  }
+  :root:not([data-theme="light"]) { --moderate: #6fb6d8; --loose: #e2a63b; --weak: #f07a6e; }
 }
-:root[data-theme="dark"] {
-  --bg: #15171c;
-  --surface: #1d2027;
-  --surface-2: #252932;
-  --ink: #eceef2;
-  --ink-2: #c3c7cf;
-  --ink-3: #9aa0ab;
-  --line: #353a45;
-  --focus: #eceef2;
-  --brain: #e0703a;
-  --brain-soft: #3a2419;
-  --computer: #4f8de8;
-  --computer-soft: #1a2a44;
-  --quantum: #c160b6;
-  --quantum-soft: #35203a;
-  --on: #f2b01e;
-  --off: #4a4f5a;
-  --off-ink: #eceef2;
-  --good: #5cc27f;
-  --moderate: #6fb6d8;
-  --loose: #e2a63b;
-  --weak: #f07a6e;
-}
+:root[data-theme="dark"] { --moderate: #6fb6d8; --loose: #e2a63b; --weak: #f07a6e; }
 
 /* ---------- base ---------- */
 *, *::before, *::after { box-sizing: border-box; }
@@ -102,8 +47,8 @@ a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 2px; 
 a:hover { text-decoration-thickness: 2px; }
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
 h1, h2, h3, h4 { line-height: 1.25; margin: 1.6em 0 .5em; }
-h1 { font-size: clamp(1.9rem, 6vw, 2.6rem); margin-top: .4em; letter-spacing: -.01em; }
-h2 { font-size: 1.55rem; }
+h1 { margin-top: .4em; }
+h2 { font-size: 1.5rem; }
 h3 { font-size: 1.2rem; }
 h4 { font-size: 1.02rem; }
 p, ul, ol { margin: 0 0 1em; }
@@ -119,52 +64,59 @@ small, .small { font-size: .875rem; }
 .skip-link:focus { top: .5rem; }
 
 /* ---------- layout ---------- */
-.wrap { max-width: var(--measure); margin: 0 auto; padding: 0 1.1rem; }
 section.page-section { padding: 1.5rem 0 1rem; border-top: 1px solid var(--line); }
 section.page-section:first-of-type { border-top: 0; }
 .eyebrow { font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin: 0; }
 .lede { font-size: 1.15rem; color: var(--ink-2); }
 
 /* ---------- header, section nav, progress ---------- */
-.site-header {
-  position: sticky; top: 0; z-index: 20;
-  background: color-mix(in srgb, var(--bg) 92%, transparent);
-  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--line);
+/* .site-header, .bar, .brand, .wordmark, .icon-btn come from the system (navy bar). */
+.site-header .bar { gap: var(--sp-1); }
+a.brand-sub { display: inline-flex; align-items: center; min-height: var(--tap); text-decoration: none; }
+a.brand-sub:hover { color: var(--on-navy); }
+.site-header .icon-btn { background: transparent; border: 0; color: var(--on-navy); padding: 0; min-width: var(--tap); }
+.site-header .icon-btn:hover { background: rgb(255 255 255 / .1); }
+/* article pages: the section nav needs the room, so the wordmark hides on phones */
+@media (max-width: 600px) {
+  .site-header .section-nav ~ .icon-btn { margin-left: auto; }
+  .site-header .bar:has(.section-nav) .wordmark { display: none; }
 }
-.site-header .bar { display: flex; align-items: center; gap: .5rem; height: var(--header-h); max-width: 60rem; margin: 0 auto; padding: 0 .75rem; }
-.site-header .home { font-weight: 700; text-decoration: none; white-space: nowrap; font-size: .95rem; }
 .section-nav { flex: 1; overflow-x: auto; scrollbar-width: none; mask-image: linear-gradient(90deg, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%); }
 .section-nav::-webkit-scrollbar { display: none; }
 .section-nav ol { display: flex; gap: .25rem; list-style: none; margin: 0; padding: 0 .5rem; }
 .section-nav li { margin: 0; }
 .section-nav a {
   display: inline-flex; align-items: center; min-height: 36px; padding: 0 .65rem;
-  border-radius: 999px; text-decoration: none; white-space: nowrap; font-size: .85rem; color: var(--ink-2);
+  border-radius: 999px; text-decoration: none; white-space: nowrap; font-size: .85rem; font-weight: 500; color: var(--on-navy-2);
 }
-.section-nav a[aria-current="true"] { background: var(--ink); color: var(--bg); }
+.section-nav a:hover { color: var(--on-navy); background: rgb(255 255 255 / .08); }
+.section-nav a[aria-current="true"] { background: rgb(255 255 255 / .16); color: var(--on-navy); }
 .theme-toggle { flex: none; }
 .progress { height: 3px; background: transparent; }
 .progress span { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--brain), var(--computer)); }
 
 /* ---------- buttons & controls ---------- */
 button, .btn {
-  font: inherit; font-size: .95rem; color: var(--ink);
+  font: inherit; font-size: .95rem; font-weight: 600; line-height: 1.25; color: var(--ink);
   min-height: var(--tap); min-width: var(--tap); padding: .4rem .9rem;
-  background: var(--surface); border: 1px solid var(--line); border-radius: 10px; cursor: pointer;
+  background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--r-md); cursor: pointer;
   display: inline-flex; align-items: center; justify-content: center; gap: .4rem; text-decoration: none;
 }
-button:hover, .btn:hover { border-color: var(--ink-3); }
+button:hover, .btn:hover { border-color: var(--ink); }
+.btn-row > button, .btn-row > .btn, .player-btns > button, .inputs > button {
+  border: 1.5px solid var(--btn2-edge); color: var(--btn2-ink);
+}
+.btn-row > button:not(.primary):not([aria-pressed="true"]):hover, .btn-row > .btn:hover,
+.player-btns > button:not(.primary):not([aria-pressed="true"]):hover, .inputs > button:not([aria-pressed="true"]):hover { background: var(--btn2-hover); }
 button:disabled { opacity: .5; cursor: not-allowed; }
 button.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-button.icon { padding: 0; width: var(--tap); }
 button[aria-pressed="true"].toggle { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 .btn-row { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin: .75rem 0; }
 
-.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); }
-.seg button { border: 0; border-radius: 0; border-right: 1px solid var(--line); }
-.seg button:last-child { border-right: 0; }
-.seg button[aria-checked="true"], .seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.seg { flex-wrap: wrap; overflow: visible; }
+.seg button { border: 0; border-radius: 8px; background: transparent; color: var(--ink-2); font-weight: 500; padding: 0 .8rem; }
+.seg button:hover { background: color-mix(in srgb, var(--surface) 60%, transparent); }
+.seg button[aria-checked="true"], .seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); font-weight: 600; box-shadow: var(--shadow-1); }
 
 input[type="range"] { width: 100%; min-height: var(--tap); accent-color: var(--ink); }
 
@@ -185,10 +137,14 @@ label { cursor: pointer; }
 .is-computer { --hue: var(--computer); --hue-soft: var(--computer-soft); }
 .is-quantum { --hue: var(--quantum); --hue-soft: var(--quantum-soft); }
 .tag {
-  display: inline-flex; align-items: center; gap: .35em; font-size: .78rem; font-weight: 600;
-  letter-spacing: .04em; text-transform: uppercase; color: var(--ink-2);
+  display: inline-flex; align-items: center; gap: 6px; min-height: 24px; padding: 0 var(--sp-2);
+  border-radius: var(--r-sm); background: var(--hue-soft, var(--raised)); color: var(--on-hue-soft, var(--ink-2));
+  font-size: var(--fs-xs); font-weight: 600; letter-spacing: .02em; white-space: nowrap;
 }
-.tag::before { content: ""; width: .7em; height: .7em; border-radius: 3px; background: var(--hue, var(--ink-3)); }
+.tag::before { content: ""; width: 8px; height: 8px; border-radius: 2px; flex: none; background: var(--hue, var(--ink-3)); }
+/* dark mode: brain-soft is burnt orange itself, so the brain square goes light */
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .is-brain .tag::before { background: var(--on-brain-soft); } }
+:root[data-theme="dark"] .is-brain .tag::before { background: var(--on-brain-soft); }
 .split { display: grid; gap: .9rem; grid-template-columns: 1fr; }
 @media (min-width: 640px) { .split { grid-template-columns: 1fr 1fr; } }
 .side {
@@ -221,6 +177,7 @@ a.fn:hover { background: var(--line); }
 
 /* ---------- callouts ---------- */
 .callout {
+  display: block;
   border: 1px solid var(--line); border-left: 4px solid var(--ink-3); border-radius: 10px;
   background: var(--surface); padding: .75rem 1rem; margin: 1rem 0; font-size: .95rem;
 }
@@ -264,8 +221,8 @@ a.fn:hover { background: var(--line); }
 
 /* ---------- logic states (1 / 0) ---------- */
 .bit {
-  display: inline-flex; align-items: center; justify-content: center; min-width: 2em; padding: 0 .4em;
-  font-family: var(--mono); font-weight: 700; border-radius: 6px; border: 1.5px solid var(--ink-3);
+  display: inline-flex; align-items: center; justify-content: center; min-width: 2em; min-height: 0; padding: 0 .4em;
+  font-family: var(--mono); font-size: inherit; line-height: inherit; font-weight: 700; border-radius: 6px; border: 1.5px solid var(--ink-3);
 }
 .bit.is-1 { background: var(--on); color: var(--on-ink); border-color: #9c6c00; }
 .bit.is-0 { background: var(--off); color: var(--off-ink); }
@@ -280,7 +237,7 @@ th.is-brain, th.is-computer { border-bottom: 3px solid var(--hue); }
 
 /* ---------- interactive module frame ---------- */
 .module {
-  background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg);
   padding: 1rem; margin: 1.25rem 0; box-shadow: 0 1px 0 rgb(0 0 0 / .03);
 }
 @media (min-width: 640px) { .module { padding: 1.25rem 1.4rem; } }
@@ -353,7 +310,9 @@ th.is-brain, th.is-computer { border-bottom: 3px solid var(--hue); }
 .quiz-score { font-weight: 700; margin: 0; }
 
 /* ---------- footer ---------- */
-.site-footer { border-top: 1px solid var(--line); margin-top: 2rem; padding: 1.5rem 0 3rem; font-size: .88rem; color: var(--ink-2); }
+.site-footer { margin-top: var(--sp-8); color: var(--ink-2); }
+.site-footer p { margin: 0 0 .5rem; }
+.site-footer .foot-brand { display: flex; font-weight: 600; }
 
 /* ---------- motion ---------- */
 @media (prefers-reduced-motion: reduce) {

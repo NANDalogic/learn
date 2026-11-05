@@ -234,19 +234,53 @@
     var spikeLayer = svg("g");
     bio.appendChild(spikeLayer);
     var bioRead = el("p", { class: "n-read", "aria-live": "polite" });
+    var tlHost = el("div", { class: "n-player" });
 
     // artificial side
     var art = el("div", { class: "art" });
 
     root.appendChild(rows);
     root.appendChild(el("div", { class: "split n-sides" }, [
-      el("div", { class: "side is-brain" }, [el("span", { class: "tag" }, "Biological neuron"), bio, bioRead]),
+      el("div", { class: "side is-brain" }, [el("span", { class: "tag" }, "Biological neuron"), bio, tlHost, bioRead]),
       el("div", { class: "side is-computer" }, [el("span", { class: "tag" }, "Artificial neuron"), art])
     ]));
     root.appendChild(el("p", { class: "small muted" }, "Same inputs drive both. Strength 0–10 acts as the synapse strength on the left and as the weight (÷10) on the right."));
 
-    var timer = null, visible = true, rate = 0;
-    S.watchVisible(root, function (v) { visible = v; });
+    // Spikes (seekable + looping): a fixed train, rate 1–5 spikes per 1.4 s, each crossing the axon in 0.9 s.
+    // Where every dot sits is a pure function of t and the current rate; the window is a whole number of periods,
+    // so the loop is seamless and dots already in flight at t = 0 are the ones from the end of the window.
+    var WIN = 2.8, CYCLE = 1.4, TRAVEL = 0.9, rate = 0, tl = null;
+    var dots = [];
+    for (var di = 0; di < 5; di++) {
+      var dot = svg("circle", { cx: axX0, cy: axY, r: 6, class: "spike-dot", display: "none" });
+      spikeLayer.appendChild(dot); dots.push(dot);
+    }
+    function drawSpikes(t) {
+      var used = 0;
+      if (rate) {
+        var P = CYCLE / rate, k1 = Math.floor(t / P + 1e-9), k0 = Math.floor((t - TRAVEL) / P + 1e-9);
+        for (var k = k1; k >= k0 && used < dots.length; k--) {
+          var age = t - k * P;
+          if (age < -1e-9 || age >= TRAVEL - 1e-9) continue;
+          dots[used].setAttribute("cx", (axX0 + (axX1 - axX0) * Math.max(0, age) / TRAVEL).toFixed(2));
+          dots[used].setAttribute("display", "inline");
+          used++;
+        }
+      }
+      for (; used < dots.length; used++) { dots[used].setAttribute("cx", axX0); dots[used].setAttribute("display", "none"); } // hidden dots hold no stale state
+    }
+    // The spike count changes the beats (one per spike), so a new rate gets a new player at the same moment.
+    function buildPlayer(wasRate) {
+      var at = tl ? tl.time() : 0, go = tl ? tl.playing() : false;
+      if (tl) tl.pause();
+      tl = null; tlHost.replaceChildren();
+      if (!rate) { delete S.timelines["m3-spikes"]; drawSpikes(0); return; }
+      var n = rate * 2, P = CYCLE / rate, beats = [];
+      for (var i = 0; i < n; i++) beats.push({ t: +(i * P).toFixed(6), label: "Spike " + (i + 1) + " of " + n + " leaves the cell body. Every spike is the same size; only how often they come changes." });
+      tl = S.timeline({ id: "m3-spikes", duration: WIN, start: wasRate ? at : 0, loop: true, draw: drawSpikes, beats: beats, labels: { play: "▶ Play spikes" } });
+      tlHost.appendChild(tl.node);
+      if (go || !wasRate) tl.play(); // crossing the threshold starts the train; a paused train stays paused
+    }
 
     function update() {
       var sum = 0, wsum = 0, terms = [];
@@ -261,11 +295,11 @@
       fill.setAttribute("y", vy(V));
       fill.setAttribute("height", G.y + G.h - vy(V));
       fill.setAttribute("class", "gauge-fill" + (fires ? " fires" : ""));
-      var over = V - THRESH;
+      var over = V - THRESH, was = rate;
       rate = fires ? clamp(1 + Math.floor(over / 4), 1, 5) : 0;
       bioRead.textContent = "Voltage " + V.toFixed(0).replace("-", "−") + " mV. " +
         (fires ? "Over threshold: it fires all-or-nothing spikes" + (rate > 2 ? ", faster the further over it goes." : ".") : "Below threshold: no spike.");
-      scheduleSpikes();
+      if (rate !== was) buildPlayer(was);
 
       // artificial
       var bias = -1.25; // same threshold, in weight units: 15 mV ÷ (1.2 mV × 10)
@@ -289,29 +323,6 @@
     }
     function fmtW(v) { return (v < 0 ? "−" : "") + Math.abs(v).toFixed(2).replace(/\.?0+$/, "") || "0"; }
 
-    function scheduleSpikes() {
-      clearInterval(timer); timer = null;
-      spikeLayer.innerHTML = "";
-      if (!rate) return;
-      if (S.reducedMotion()) {
-        for (var i = 0; i < rate; i++) spikeLayer.appendChild(svg("circle", { cx: axX0 + 18 + i * 26, cy: axY, r: 6, class: "spike-dot" }));
-        return;
-      }
-      fire();
-      timer = setInterval(fire, 1400 / rate);
-    }
-    function fire() {
-      if (!visible) return;
-      var dot = svg("circle", { cx: axX0, cy: axY, r: 6, class: "spike-dot" });
-      spikeLayer.appendChild(dot);
-      var t0 = performance.now();
-      (function step(t) {
-        var p = (t - t0) / 900;
-        if (p >= 1) { dot.remove(); return; }
-        dot.setAttribute("cx", axX0 + (axX1 - axX0) * p);
-        requestAnimationFrame(step);
-      })(t0);
-    }
     update();
   }
 

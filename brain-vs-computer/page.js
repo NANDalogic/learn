@@ -330,7 +330,7 @@
      M4. Synapse close-up
      ========================================================= */
   function synapse(root) {
-    var st = { chem: true, glu: true, dopa: false, strength: 1, busy: false };
+    var st = { chem: true, glu: true, dopa: false, strength: 1 };
     var W = 340, H = 300;
     var pic = svg("svg", { viewBox: "0 0 " + W + " " + H, role: "img", "aria-label": "Synapse: sending terminal above, gap, receiving dendrite below, and the receiving neuron's voltage trace" });
     var wash = svg("rect", { x: 0, y: 0, width: W, height: 196, class: "wash", rx: 12 });
@@ -355,8 +355,9 @@
     var junctions = svg("g", { class: "junctions" });
     [130, 170, 210].forEach(function (x) { junctions.appendChild(svg("rect", { x: x - 7, y: 94, width: 14, height: 42, rx: 3, class: "junction" })); });
     pic.appendChild(junctions);
-    var particles = svg("g");
-    pic.appendChild(particles);
+    // particles: built once, positioned from t (hidden ones hold no stale state)
+    var nts = [120, 150, 170, 190, 220].map(function (x) { var c = svg("circle", { cx: x, cy: 100, r: 4, class: "nt", display: "none" }); pic.appendChild(c); return c; });
+    var ions = [130, 170, 210].map(function (x) { var c = svg("circle", { cx: x, cy: 100, r: 3, class: "ion", display: "none" }); pic.appendChild(c); return c; });
     var spikeDot = svg("circle", { cx: 170, cy: -10, r: 7, class: "spike-dot" });
     pic.appendChild(spikeDot);
     // trace
@@ -369,27 +370,29 @@
     var trace = svg("polyline", { class: "trace", points: "" });
     pic.appendChild(trace);
 
-    var steps = el("ol", { class: "syn-steps" }, [
+    var STEP_TEXT = [
       "A spike arrives at the axon terminal.",
       "The terminal releases neurotransmitters.",
       "They cross the gap and bind to receptors on the next neuron.",
       "Ion channels open and nudge the next neuron's voltage."
-    ].map(function (t) { return el("li", null, t); }));
+    ];
+    var steps = el("ol", { class: "syn-steps" }, STEP_TEXT.map(function (t) { return el("li", null, t); }));
     var stepItems = steps.querySelectorAll("li");
 
     var fireBtn = el("button", { type: "button", class: "primary" }, "Send a spike");
     var practiceBtn = el("button", { type: "button" }, "Practice ×5");
     var resetBtn = el("button", { type: "button" }, "Reset");
-    var segType = S.segmented("Synapse type", [["chem", "Chemical"], ["elec", "Electrical"]], "chem", function (v) { st.chem = v === "chem"; sync(); });
-    var segTx = S.segmented("Neurotransmitter", [["glu", "Glutamate (excitatory)"], ["gaba", "GABA (inhibitory)"]], "glu", function (v) { st.glu = v === "glu"; sync(); });
+    var segType = S.segmented("Synapse type", [["chem", "Chemical"], ["elec", "Electrical"]], "chem", function (v) { st.chem = v === "chem"; changed(); });
+    var segTx = S.segmented("Neurotransmitter", [["glu", "Glutamate (excitatory)"], ["gaba", "GABA (inhibitory)"]], "glu", function (v) { st.glu = v === "glu"; changed(); });
     var dopaBtn = el("button", { type: "button", class: "toggle", "aria-pressed": "false" }, "Dopamine wash");
-    dopaBtn.addEventListener("click", function () { st.dopa = !st.dopa; sync(); });
+    dopaBtn.addEventListener("click", function () { st.dopa = !st.dopa; changed(); });
     var status = el("p", { class: "syn-status", "aria-live": "polite" });
     var meter = el("div", { class: "strength-meter" }, el("span"));
+    var tlHost = el("div", { class: "syn-player" });
 
-    fireBtn.addEventListener("click", function () { fire(); });
-    practiceBtn.addEventListener("click", practice);
-    resetBtn.addEventListener("click", function () { st.strength = 1; events = []; sync(); drawTrace(); status.textContent = "Reset: synapse back to starting strength."; });
+    fireBtn.addEventListener("click", function () { start("fire"); });
+    practiceBtn.addEventListener("click", function () { if (st.chem) start("practice"); });
+    resetBtn.addEventListener("click", function () { settle(); st.strength = 1; idle(); status.textContent = "Reset: synapse back to starting strength."; });
 
     root.appendChild(el("div", { class: "syn-controls" }, [
       el("div", { class: "ctl" }, [el("span", { class: "ctl-label" }, "Type"), segType.node]),
@@ -400,13 +403,39 @@
       el("div", { class: "syn-pic" }, pic),
       el("div", { class: "syn-side" }, [steps,
         el("div", null, [el("span", { class: "ctl-label" }, "Synapse strength"), meter]),
-        el("div", { class: "btn-row" }, [fireBtn, practiceBtn, resetBtn]), status])
+        el("div", { class: "btn-row" }, [fireBtn, practiceBtn, resetBtn]), tlHost, status])
     ]));
 
-    var events = []; // {t, amp}
-    var raf = null;
+    // Fixed sequences on Site.timeline (11/4/2026). "Send a spike" = one 1.2 s fire; "Practice ×5" = five fires,
+    // 1.2 s apart (6 s). The trace's x-axis is timeline time, so every bump, dot and step is a pure function of t
+    // and the settings. A new press replaces the run (bumps no longer stack). Each practice fire strengthens the
+    // synapse by 0.2 just after its bump, so the five bumps sit side by side and grow; the new strength is kept.
+    var FIRE = 1.2, ARRIVE = 0.3, MAX = 2.6, GAIN_AT = 1.0;
+    var run = null, tl = null; // run = { kind: "fire"|"practice", base }
+    function cross() { return st.chem ? 0.45 : 0.1; }          // spike reaches terminal → voltage moves
+    function fires() { return run.kind === "practice" ? 5 : 1; }
+    function strengthAt(t) {                                   // practice: +0.2 after each fire's bump
+      if (!run || run.kind !== "practice") return run ? run.base : st.strength;
+      var k = 0;
+      for (var i = 0; i < 5; i++) if (i * FIRE + GAIN_AT <= t + 1e-6) k++;
+      return Math.min(MAX, Math.round((run.base + 0.2 * k) * 10) / 10);
+    }
+    function amp(s) { return (st.chem ? (st.glu ? 1 : -0.8) * s : 0.8) * (st.dopa ? 1.5 : 1); }
+    // one bump: fast rise, ~0.2 s decay (illustrative), peak ≈ 0.89 × amplitude
+    function shape(dt) { return dt < 0 ? 0 : (Math.exp(-dt / 0.18) - Math.exp(-dt / 0.0216)) * 1.35; }
+    function volt(x) {
+      var v = 0, land = ARRIVE + cross();
+      for (var i = 0; i < fires(); i++) v += amp(strengthAt(i * FIRE)) * shape(x - i * FIRE - land);
+      return v;
+    }
+    function stepAt(local) { // which of the 4 listed steps is showing, inside one fire
+      var c = cross(), land = ARRIVE + c;
+      if (local >= land - 1e-6) return 3;
+      if (local >= ARRIVE - 1e-6) return st.chem ? (local >= ARRIVE + c * 0.55 - 1e-6 ? 2 : 1) : 2;
+      return 0;
+    }
 
-    function sync() {
+    function sync() { // settings-driven parts of the picture
       segTx.node.closest(".ctl").hidden = !st.chem;
       vesicles.style.display = st.chem ? "" : "none";
       junctions.style.display = st.chem ? "none" : "";
@@ -416,107 +445,104 @@
       wash.setAttribute("class", "wash" + (st.dopa ? " on" : ""));
       practiceBtn.disabled = !st.chem;
       practiceBtn.title = st.chem ? "" : "Electrical synapses can't be adjusted";
-      stepItems[1].textContent = st.chem ? "The terminal releases neurotransmitters." : "(Electrical: no chemical step.)";
-      stepItems[2].textContent = st.chem ? "They cross the gap and bind to receptors on the next neuron." : "Charge passes straight through the gap junction.";
-      // receptors grow with strength
-      receptors.innerHTML = "";
-      var n = Math.round(3 + (st.strength - 1) * 5);
-      for (var i = 0; i < n; i++) {
-        var x = 80 + (180 / (n - 1 || 1)) * i;
-        receptors.appendChild(svg("path", { d: "M" + (x - 6) + " 128 L" + (x - 6) + " 136 L" + (x + 6) + " 136 L" + (x + 6) + " 128", class: "receptor" }));
+      stepItems[1].textContent = st.chem ? STEP_TEXT[1] : "(Electrical: no chemical step.)";
+      stepItems[2].textContent = st.chem ? STEP_TEXT[2] : "Charge passes straight through the gap junction.";
+    }
+    var shownN = -1;
+    function drawStrength(s) { // receptors grow with strength
+      var n = Math.round(3 + (s - 1) * 5);
+      if (n !== shownN) {
+        shownN = n; receptors.replaceChildren();
+        for (var i = 0; i < n; i++) {
+          var x = 80 + (180 / (n - 1 || 1)) * i;
+          receptors.appendChild(svg("path", { d: "M" + (x - 6) + " 128 L" + (x - 6) + " 136 L" + (x + 6) + " 136 L" + (x + 6) + " 128", class: "receptor" }));
+        }
       }
-      meter.firstChild.style.width = ((st.strength - 1) / 1.6 * 100) + "%";
-      meter.setAttribute("aria-label", "Synapse strength ×" + st.strength.toFixed(1));
-      meter.title = "×" + st.strength.toFixed(1);
+      meter.firstChild.style.width = ((s - 1) / 1.6 * 100) + "%";
+      meter.setAttribute("aria-label", "Synapse strength ×" + s.toFixed(1));
+      meter.title = "×" + s.toFixed(1);
     }
+    function setStep(i) { stepItems.forEach(function (li, k) { li.className = k === i ? "active" : k < i ? "done" : ""; }); } // className, not classList.toggle: same HTML whatever came before
+    function hideParticles() { nts.concat(ions).forEach(function (c) { c.setAttribute("cy", 100); c.setAttribute("display", "none"); }); }
 
-    function amplitude() {
-      var a = st.chem ? (st.glu ? 1 : -0.8) * st.strength : 0.8;
-      return a * (st.dopa ? 1.5 : 1);
+    // The whole frame at time t of the loaded run.
+    function draw(t) {
+      var D = fires() * FIRE, k = Math.min(fires() - 1, Math.floor(t / FIRE + 1e-6)), local = t - k * FIRE;
+      var c = cross(), land = ARRIVE + c;
+      drawStrength(strengthAt(t));
+      setStep(stepAt(local));
+      spikeDot.setAttribute("cy", local < ARRIVE ? (-10 + 60 * local / ARRIVE).toFixed(2) : -10);
+      hideParticles();
+      if (local >= ARRIVE - 1e-6 && local < land - 1e-6) {
+        var p = (local - ARRIVE) / c;
+        (st.chem ? nts : ions).forEach(function (d) { d.setAttribute("cy", (100 + 30 * p).toFixed(2)); d.setAttribute("display", "inline"); });
+      }
+      var pts = [], N = 40 * fires();
+      for (var i = 0; i <= N && i * D / N <= t + 1e-9; i++) pts.push(pt(i * D / N));
+      if (t > 1e-9 && Math.abs(t - (i - 1) * D / N) > 1e-9) pts.push(pt(t));
+      trace.setAttribute("points", pts.join(" "));
+      status.textContent = t >= D - 1e-6 ? result() : "";
+      function pt(x) { return (TX0 + (TX1 - TX0) * x / D).toFixed(1) + "," + (TY - clamp(volt(x) * 11, -30, 30)).toFixed(1); }
     }
-
-    function setStep(i) { stepItems.forEach(function (li, k) { li.classList.toggle("active", k === i); li.classList.toggle("done", k < i); }); }
-
-    function fire(cb) {
-      if (st.busy) { if (cb) setTimeout(function () { fire(cb); }, 200); return; }
-      st.busy = true; fireBtn.disabled = true;
-      var amp = amplitude();
-      var desc = st.chem ? (st.glu ? "Glutamate pushed the next neuron toward firing." : "GABA pushed the next neuron away from firing.") : "Charge flowed straight across: fast, fixed strength.";
-      if (S.reducedMotion()) {
-        setStep(4);
-        events.push({ t: performance.now() - 300, amp: amp });
-        drawTrace();
-        done();
+    function result() {
+      if (run.kind === "practice") {
+        return strengthAt(5 * FIRE) > run.base
+          ? "Practice made the synapse stronger: more receptors, a bigger response each time. That's learning."
+          : "The synapse is already at full strength in this demo. Press Reset to start over.";
+      }
+      return st.chem ? (st.glu ? "Glutamate pushed the next neuron toward firing." : "GABA pushed the next neuron away from firing.") : "Charge flowed straight across: fast, fixed strength.";
+    }
+    function beats() {
+      var c = cross(), b = [];
+      for (var i = 0; i < fires(); i++) {
+        var o = i * FIRE, pre = run.kind === "practice" ? "Fire " + (i + 1) + " of 5 (strength ×" + strengthAt(o).toFixed(1) + "). " : "";
+        b.push({ t: o, label: pre + STEP_TEXT[0] });
+        if (run.kind === "practice") continue; // practice: one beat per fire; the step list still follows t
+        if (st.chem) {
+          b.push({ t: o + ARRIVE, label: STEP_TEXT[1] });
+          b.push({ t: o + ARRIVE + c * 0.55, label: STEP_TEXT[2] });
+        } else b.push({ t: o + ARRIVE, label: "Charge passes straight through the gap junction: no chemical step." });
+        b.push({ t: +(o + ARRIVE + c).toFixed(6), label: STEP_TEXT[3] });
+      }
+      return b;
+    }
+    function idle() { // no run loaded: resting picture
+      sync(); drawStrength(st.strength); setStep(-1); hideParticles(); spikeDot.setAttribute("cy", -10);
+      trace.setAttribute("points", TX0 + "," + TY + " " + TX1 + "," + TY);
+    }
+    function id() { return run.kind === "practice" ? "m4-practice" : "m4-fire"; }
+    // Leave the loaded run: whatever strength it shows now is kept.
+    function settle() {
+      if (!run) return;
+      st.strength = strengthAt(tl.time());
+      tl.pause(); delete S.timelines[id()];
+      run = null; tl = null; tlHost.replaceChildren();
+    }
+    function build(at, go) {
+      sync();
+      var practice = run.kind === "practice";
+      tl = S.timeline({
+        id: id(), duration: fires() * FIRE, start: at, beats: beats(), draw: draw,
+        labels: practice ? { play: "▶ Play practice", replay: "▶ Replay practice" } : { play: "▶ Play spike", replay: "▶ Replay spike" }
+      });
+      tlHost.replaceChildren(tl.node);
+      if (go) tl.play();
+    }
+    function start(kind) { settle(); run = { kind: kind, base: st.strength }; build(0, true); }
+    // A setting changed: rebuild the same run with the new setting at the same moment (keeps playing or paused).
+    function changed() {
+      if (!run) { idle(); return; }
+      if (run.kind === "practice" && !st.chem) {
+        settle(); idle();
+        status.textContent = "Electrical synapses can't be adjusted, so practice stopped. The strength reached so far is kept.";
         return;
       }
-      var t0 = performance.now(), chem = st.chem, released = false, landed = false;
-      var arrive = 350, cross = chem ? 650 : 120, land = arrive + cross;
-      setStep(0);
-      (function step(t) {
-        var e = t - t0;
-        if (e < arrive) {
-          spikeDot.setAttribute("cy", -10 + (60 * e / arrive));
-        } else {
-          spikeDot.setAttribute("cy", -10);
-          if (!released) {
-            released = true; setStep(1);
-            var xs = chem ? [120, 150, 170, 190, 220] : [130, 170, 210];
-            xs.forEach(function (x) { particles.appendChild(svg("circle", { cx: x, cy: 100, r: chem ? 4 : 3, class: chem ? "nt" : "ion" })); });
-          }
-          var p = clamp((e - arrive) / cross, 0, 1);
-          Array.prototype.forEach.call(particles.childNodes, function (c) { c.setAttribute("cy", 100 + 30 * p); });
-          if (p > .5 && chem) setStep(2);
-          if (p >= 1 && !landed) {
-            landed = true; setStep(3);
-            particles.innerHTML = "";
-            events.push({ t: performance.now(), amp: amp });
-            loop();
-          }
-        }
-        if (e < land + 50) requestAnimationFrame(step); else done();
-      })(t0);
-      function done() { st.busy = false; fireBtn.disabled = false; status.textContent = desc; if (cb) cb(); }
+      var at = tl.time(), go = tl.playing();
+      tl.pause();
+      build(at, go);
     }
 
-    function practice() {
-      if (st.busy || practiceBtn.disabled) return;
-      var left = 5;
-      practiceBtn.disabled = true;
-      (function next() {
-        if (!left--) {
-          practiceBtn.disabled = !st.chem;
-          status.textContent = "Practice made the synapse stronger: more receptors, a bigger response. That's learning.";
-          return;
-        }
-        st.strength = Math.min(2.6, st.strength + 0.2);
-        sync();
-        if (S.reducedMotion()) { events.push({ t: performance.now() - 300 + left * 10, amp: amplitude() }); drawTrace(); next(); }
-        else fire(function () { setTimeout(next, 150); });
-      })();
-    }
-
-    // trace: sum of decaying bumps over a 4-second window
-    var WIN = 4000;
-    function shape(dt) { if (dt < 0) return 0; return (Math.exp(-dt / 500) - Math.exp(-dt / 60)) * 1.35; }
-    function drawTrace() {
-      var now = performance.now(), pts = [];
-      for (var i = 0; i <= 120; i++) {
-        var t = now - WIN + (WIN * i / 120), v = 0;
-        events.forEach(function (ev) { v += ev.amp * shape(t - ev.t); });
-        pts.push((TX0 + (TX1 - TX0) * i / 120).toFixed(1) + "," + (TY - clamp(v * 11, -30, 30)).toFixed(1));
-      }
-      trace.setAttribute("points", pts.join(" "));
-      events = events.filter(function (ev) { return now - ev.t < WIN + 500; });
-    }
-    function loop() {
-      if (raf || S.reducedMotion()) { drawTrace(); return; }
-      (function tick() {
-        drawTrace();
-        raf = events.length ? requestAnimationFrame(tick) : null;
-      })();
-    }
-
-    sync(); setStep(-1); drawTrace();
+    idle();
   }
 
   /* =========================================================

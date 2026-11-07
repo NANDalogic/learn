@@ -423,6 +423,9 @@
     function amp(s) { return (st.chem ? (st.glu ? 1 : -0.8) * s : 0.8) * (st.dopa ? 1.5 : 1); }
     // one bump: fast rise, ~0.2 s decay (illustrative), peak ≈ 0.89 × amplitude
     function shape(dt) { return dt < 0 ? 0 : (Math.exp(-dt / 0.18) - Math.exp(-dt / 0.0216)) * 1.35; }
+    // px per voltage unit: the biggest bump (glutamate + dopamine at full strength) just fits the ±30 px trace, so
+    // every practice step stays visibly taller than the last (was 11, which clipped from ×1.8 with dopamine)
+    var VSCALE = 30 / (MAX * 1.5 * 0.89);
     function volt(x) {
       var v = 0, land = ARRIVE + cross();
       for (var i = 0; i < fires(); i++) v += amp(strengthAt(i * FIRE)) * shape(x - i * FIRE - land);
@@ -482,7 +485,7 @@
       if (t > 1e-9 && Math.abs(t - (i - 1) * D / N) > 1e-9) pts.push(pt(t));
       trace.setAttribute("points", pts.join(" "));
       status.textContent = t >= D - 1e-6 ? result() : "";
-      function pt(x) { return (TX0 + (TX1 - TX0) * x / D).toFixed(1) + "," + (TY - clamp(volt(x) * 11, -30, 30)).toFixed(1); }
+      function pt(x) { return (TX0 + (TX1 - TX0) * x / D).toFixed(1) + "," + (TY - clamp(volt(x) * VSCALE, -30, 30)).toFixed(1); }
     }
     function result() {
       if (run.kind === "practice") {
